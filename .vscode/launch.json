@@ -1,15 +1,16 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
         {
             "type": "java",
-            "name": "Current File",
+            "name": "Run DbTest",
             "request": "launch",
-            "mainClass": "${file}"
+            "mainClass": "DbTest",
+            "projectName": "Er_Triage_Project_MAIN-frontend-ui",
+            "classPaths": [
+                "backend/ER_JAVA_PROJECT/lib/mysql-connector-j-9.5.0.jar",
+                "backend/ER_JAVA_PROJECT/src"
+            ]
         }
     ]
 }
