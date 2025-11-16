@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>ER Triage System Dashboard</title>
+</head>
+
+<body>
+  <!-- HEADER -->
+  <header class="main-header">
+    <div class="header-content">
+      <img src="/lift/images/xCGUQrew_400x400.jpg" alt="Hospital Logo" class="logo">
+      <h1>Hospital System</h1>
+    </div>
+  </header>
+
+  <!-- DASHBOARD CONTAINER CENTERED -->
+  <div class="dashboard-center">
+    <div class="dashboard-box">
+      <h2>ER Triage System</h2>
+      <button id="viewBtn">View Patients</button>
+      <button id="registerBtn">Register Patient</button>
+    </div>
+  </div>
+
+  <!-- REGISTER POPUP BOX -->
+  <div class="register-box" id="registerBox">
+    <h2>Register Patient</h2>
+    <form>
+      <input type="text" name="patientName" placeholder="Patient Name" required>
+      <input type="text" name="patientId" placeholder="Patient ID" required>
+      <textarea name="symptoms" placeholder="Symptoms" required></textarea>
+      <input type="number" name="age" placeholder="Age" min="0" max="200" required>
+      <input type="text" name="vitals" placeholder="Vitals (BP, HR, Temp)">
+      <button type="submit" id="newRegisterBtn">Register</button>
+      <button type="button" id="cancelRegister">Cancel</button>
+    </form>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="main-footer">
+    <div class="footer-content">
+      <img src="/lift/images/xCGUQrew_400x400.jpg" alt="Hospital Logo" class="logo">
+      <p>© 2025 Hospital system | All Rights Reserved</p>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>

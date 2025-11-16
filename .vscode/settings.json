@@ -1,0 +1,25 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "xprotocol",
+                "enableSsl": "Disabled"
+            },
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 33060,
+            "driver": "MySQL",
+            "name": "MySQL",
+            "username": "root",
+            "password": "Alya1020",
+            "database": "er_triage_db",
+            "connectionTimeout": 30
+        }
+    ],
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "c:\\Users\\rakan\\Desktop\\mysql-connector-j-9.3.0.jar",
+        "c:\\Users\\rakan\\Desktop\\mysql-connector-j-9.5.0\\mysql-connector-j-9.5.0.jar"
+    ]
+}
