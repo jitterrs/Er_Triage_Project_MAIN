@@ -543,20 +543,6 @@ tr:hover {
   color: #333;
 }
 
-/* Nurse Info Styles */
-.nurse-info {
-  text-align: center;
-}
-
-.nurse-avatar {
-  font-size: 48px;
-  margin-bottom: 15px;
-}
-
-.nurse-info h4 {
-  margin: 0 0 20px 0;
-  color: #333;
-}
 
 /* Responsive Design */
 @media (max-width: 768px) {
