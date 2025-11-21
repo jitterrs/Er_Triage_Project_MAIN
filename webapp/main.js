@@ -78,165 +78,92 @@ function initializePatientDashboard() {
   const modalTabBtns = document.querySelectorAll('.tab-btn');
   const modalTabPanes = document.querySelectorAll('.tab-pane');
 
-  // --- Admit / Discharge Buttons ---
-  const modalAdmitBtn = document.getElementById('modalAdmitBtn');
-  const modalDischargeBtn = document.getElementById('modalDischargeBtn');
-
   // --- Patient Tables ---
   const patientTableBody = document.querySelector("#patientTable tbody");
   const queueTableBody = document.querySelector("#queueTable tbody");
   const inTreatmentTableBody = document.querySelector("#inTreatmentTable tbody");
 
-  // Auto-refresh interval (30 seconds)
-  let refreshInterval;
-  const REFRESH_INTERVAL_MS = 30000; // 30 seconds
-
-  // Start auto-refresh
-  function startAutoRefresh() {
-    refreshInterval = setInterval(() => {
-      console.log("Auto-refreshing patient data...");
-      loadPatientsFromDatabase();
-    }, REFRESH_INTERVAL_MS);
-  }
-
-  // Stop auto-refresh (if needed)
-  function stopAutoRefresh() {
-    if (refreshInterval) {
-      clearInterval(refreshInterval);
-    }
-  }
-
-  // --- Fetch patients from database ---
-  async function loadPatientsFromDatabase() {
-    try {
-      console.log("Fetching patients from database...");
-      const response = await fetch('http://localhost:8080/er_triage_db/patients');
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const patients = await response.json();
-      console.log("Patients fetched:", patients.length);
-      loadPatients(patients);
-      
-    } catch (error) {
-      console.error('Error fetching patients:', error);
-      // Fallback to sample data if database is unavailable
-      console.log("Using sample data as fallback...");
-      loadPatients(getSamplePatients());
-    }
-  }
-
-  // --- Update patient status in database ---
-  async function updatePatientStatus(patientId, newStatus) {
-    try {
-      const response = await fetch(`http://localhost:8080/er_triage_db/patients/${patientId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          status: newStatus,
-          treatmentStart: newStatus === 'IN_TREATMENT' ? new Date().toLocaleTimeString() : null
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      console.log(`Patient ${patientId} status updated to ${newStatus}`);
-      return true;
-    } catch (error) {
-      console.error('Error updating patient status:', error);
-      return false;
-    }
-  }
-
-  // Sample data fallback
-  function getSamplePatients() {
-    return [
-      {
-        id: "1",
-        name: "Noura",
-        age: "70",
-        gender: "F",
-        triageLevel: 2,
-        symptoms: "Chest pain, shortness of breath",
-        status: "WAITING",
-        waitTime: "15 min",
-        treatmentStart: "",
-        currentMeds: "Aspirin",
-        medicalHistory: "Hypertension",
-        vitals: {
-          bpSys: "102",
-          bpDia: "65",
-          hr: "96",
-          rr: "22",
-          spo2: "93",
-          temp: "37.8"
-        },
-        triageScore: "8",
-        redFlag: "No",
-        triageReason: "SBP 102; SpO2 93%; chest pain",
-        createdAt: "2025-01-15 10:15:00",
-        updatedAt: "2025-01-15 10:15:00"
+  // Sample patient data
+  const samplePatients = [
+    {
+      id: "1",
+      name: "Noura",
+      age: "70",
+      gender: "F",
+      triageLevel: 2,
+      symptoms: "Chest pain, shortness of breath",
+      status: "WAITING",
+      waitTime: "15 min",
+      treatmentStart: "",
+      currentMeds: "Aspirin",
+      medicalHistory: "Hypertension",
+      vitals: {
+        bpSys: "102",
+        bpDia: "65",
+        hr: "96",
+        rr: "22",
+        spo2: "93",
+        temp: "37.8"
       },
-      {
-        id: "2",
-        name: "Ali",
-        age: "30",
-        gender: "M",
-        triageLevel: 3,
-        symptoms: "Mild abdominal pain",
-        status: "WAITING",
-        waitTime: "25 min",
-        treatmentStart: "",
-        currentMeds: "None",
-        medicalHistory: "None",
-        vitals: {
-          bpSys: "120",
-          bpDia: "80",
-          hr: "88",
-          rr: "18",
-          spo2: "97",
-          temp: "37.0"
-        },
-        triageScore: "3",
-        redFlag: "No",
-        triageReason: "Stable vitals, mild abdominal pain",
-        createdAt: "2025-01-15 10:20:00",
-        updatedAt: "2025-01-15 10:20:00"
+      triageScore: "8",
+      redFlag: "No",
+      triageReason: "SBP 102; SpO2 93%; chest pain",
+      createdAt: "2025-01-15 10:15:00",
+      updatedAt: "2025-01-15 10:15:00"
+    },
+    {
+      id: "2",
+      name: "Ali",
+      age: "30",
+      gender: "M",
+      triageLevel: 3,
+      symptoms: "Mild abdominal pain",
+      status: "WAITING",
+      waitTime: "25 min",
+      treatmentStart: "",
+      currentMeds: "None",
+      medicalHistory: "None",
+      vitals: {
+        bpSys: "120",
+        bpDia: "80",
+        hr: "88",
+        rr: "18",
+        spo2: "97",
+        temp: "37.0"
       },
-      {
-        id: "3",
-        name: "Sara",
-        age: "55",
-        gender: "F",
-        triageLevel: 1,
-        symptoms: "Severe chest pain, sweating",
-        status: "IN_TREATMENT",
-        waitTime: "5 min",
-        treatmentStart: "10:30 AM",
-        currentMeds: "Metformin",
-        medicalHistory: "Diabetes Type 2",
-        vitals: {
-          bpSys: "85",
-          bpDia: "55",
-          hr: "120",
-          rr: "30",
-          spo2: "84",
-          temp: "38.2"
-        },
-        triageScore: "12",
-        redFlag: "Yes",
-        triageReason: "SpO2 84%; SBP 85; severe chest pain",
-        createdAt: "2025-01-15 10:25:00",
-        updatedAt: "2025-01-15 10:30:00"
-      }
-    ];
-  }
+      triageScore: "3",
+      redFlag: "No",
+      triageReason: "Stable vitals, mild abdominal pain",
+      createdAt: "2025-01-15 10:20:00",
+      updatedAt: "2025-01-15 10:20:00"
+    },
+    {
+      id: "3",
+      name: "Sara",
+      age: "55",
+      gender: "F",
+      triageLevel: 1,
+      symptoms: "Severe chest pain, sweating",
+      status: "IN_TREATMENT",
+      waitTime: "5 min",
+      treatmentStart: "10:30 AM",
+      currentMeds: "Metformin",
+      medicalHistory: "Diabetes Type 2",
+      vitals: {
+        bpSys: "85",
+        bpDia: "55",
+        hr: "120",
+        rr: "30",
+        spo2: "84",
+        temp: "38.2"
+      },
+      triageScore: "12",
+      redFlag: "Yes",
+      triageReason: "SpO2 84%; SBP 85; severe chest pain",
+      createdAt: "2025-01-15 10:25:00",
+      updatedAt: "2025-01-15 10:30:00"
+    }
+  ];
 
   // --- Navigation Function ---
   function showSection(section) {
@@ -293,15 +220,11 @@ function initializePatientDashboard() {
     if (inTreatmentTableBody) inTreatmentTableBody.innerHTML = '';
 
     patients.forEach(patient => {
-      // Convert database status to display status
-      const displayStatus = patient.status === 'WAITING' ? 'Waiting' : 
-                           patient.status === 'IN_TREATMENT' ? 'In Treatment' : 'Treated';
-
-      // Calculate wait time (simplified - you can enhance this)
+      // Calculate wait time
       const waitTime = patient.status === 'WAITING' ? 
         (Math.floor(Math.random() * 30) + 5) + ' min' : '-';
 
-      // --- Patient Info Table (All Patients) ---
+      // --- Patient Info Table (All Patients - Only View Button) ---
       if (patientTableBody) {
         const rowPatient = document.createElement('tr');
         rowPatient.innerHTML = `
@@ -309,12 +232,14 @@ function initializePatientDashboard() {
           <td>${patient.name}</td>
           <td><span class="triage-level level-${patient.triageLevel}">Level ${patient.triageLevel}</span></td>
           <td>${patient.symptom || patient.symptoms}</td>
-          <td class="text-right"><button class="info-btn" data-patient-id="${patient.id}">View</button></td>
+          <td class="text-right">
+            <button class="info-btn" data-patient-id="${patient.id}">View Info</button>
+          </td>
         `;
         patientTableBody.appendChild(rowPatient);
       }
 
-      // --- Queue Table (Level 2 & 3, waiting) ---
+      // --- Queue Table (Level 2 & 3, waiting - Only Admit Button) ---
       if (queueTableBody && patient.triageLevel >= 2 && patient.status === "WAITING") {
         const rowQueue = document.createElement('tr');
         rowQueue.innerHTML = `
@@ -323,12 +248,14 @@ function initializePatientDashboard() {
           <td><span class="triage-level level-${patient.triageLevel}">Level ${patient.triageLevel}</span></td>
           <td>${patient.symptom || patient.symptoms}</td>
           <td>${waitTime}</td>
-          <td><button class="info-btn" data-patient-id="${patient.id}">View</button></td>
+          <td class="text-right">
+            <button class="action-btn admit-btn" data-patient-id="${patient.id}">Admit to Treatment</button>
+          </td>
         `;
         queueTableBody.appendChild(rowQueue);
       }
 
-      // --- In-Treatment Table (Level 1, in treatment) ---
+      // --- In-Treatment Table (Level 1, in treatment - Only Discharge Button) ---
       if (inTreatmentTableBody && patient.triageLevel === 1 && patient.status === "IN_TREATMENT") {
         const rowTreatment = document.createElement('tr');
         rowTreatment.innerHTML = `
@@ -337,21 +264,52 @@ function initializePatientDashboard() {
           <td><span class="triage-level level-${patient.triageLevel}">Level ${patient.triageLevel}</span></td>
           <td>${patient.symptom || patient.symptoms}</td>
           <td>${patient.treatmentStart || '-'}</td>
-          <td><button class="info-btn" data-patient-id="${patient.id}">View</button></td>
+          <td class="text-right">
+            <button class="action-btn discharge-btn" data-patient-id="${patient.id}">Discharge</button>
+          </td>
         `;
         inTreatmentTableBody.appendChild(rowTreatment);
       }
     });
 
-    console.log("Tables populated, attaching modal events...");
+    console.log("Tables populated, attaching button events...");
 
-    // --- Attach Modal Event to all info buttons ---
+    // --- Attach View Button Events (Patient Info Table Only) ---
     document.querySelectorAll('.info-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const patientId = btn.getAttribute('data-patient-id');
         const patient = patients.find(p => p.id == patientId);
         console.log("View button clicked for patient:", patientId, patient);
         if (patient) showPatientModal(patient);
+      });
+    });
+
+    // --- Attach Admit Button Events (Queue Table) ---
+    document.querySelectorAll('.admit-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const patientId = btn.getAttribute('data-patient-id');
+        console.log("Admit button clicked for patient:", patientId);
+        const patient = patients.find(p => p.id == patientId);
+        if (patient) {
+          // Update status locally (no database update for now)
+          patient.status = "IN_TREATMENT";
+          patient.treatmentStart = new Date().toLocaleTimeString();
+          loadPatients(patients); // Refresh the display
+        }
+      });
+    });
+
+    // --- Attach Discharge Button Events (In-Treatment Table) ---
+    document.querySelectorAll('.discharge-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const patientId = btn.getAttribute('data-patient-id');
+        console.log("Discharge button clicked for patient:", patientId);
+        const patient = patients.find(p => p.id == patientId);
+        if (patient) {
+          // Update status locally (no database update for now)
+          patient.status = "TREATED";
+          loadPatients(patients); // Refresh the display
+        }
       });
     });
   }
@@ -404,29 +362,6 @@ function initializePatientDashboard() {
     if (modalStatus) modalStatus.textContent = patient.status === 'WAITING' ? 'Waiting' : 
                                               patient.status === 'IN_TREATMENT' ? 'In Treatment' : 'Treated';
 
-    // Show/hide admit/discharge buttons based on status
-    if (modalAdmitBtn) {
-      modalAdmitBtn.style.display = patient.status === "IN_TREATMENT" ? "none" : "inline-block";
-      modalAdmitBtn.onclick = async () => {
-        const success = await updatePatientStatus(patient.id, 'IN_TREATMENT');
-        if (success) {
-          loadPatientsFromDatabase(); // Refresh data
-        }
-        if (patientModal) patientModal.classList.add('hidden');
-      };
-    }
-
-    if (modalDischargeBtn) {
-      modalDischargeBtn.style.display = patient.status === "WAITING" ? "none" : "inline-block";
-      modalDischargeBtn.onclick = async () => {
-        const success = await updatePatientStatus(patient.id, 'TREATED');
-        if (success) {
-          loadPatientsFromDatabase(); // Refresh data
-        }
-        if (patientModal) patientModal.classList.add('hidden');
-      };
-    }
-
     if (patientModal) {
       patientModal.classList.remove('hidden');
     }
@@ -459,8 +394,7 @@ function initializePatientDashboard() {
   }
 
   // Initialize dashboard
-  loadPatientsFromDatabase(); // Load from database first
+  loadPatients(samplePatients);
   showSection('patientInfo');
-  startAutoRefresh(); // Start auto-refresh
-  console.log("Patient dashboard initialized successfully with auto-refresh");
+  console.log("Patient dashboard initialized successfully");
 }
