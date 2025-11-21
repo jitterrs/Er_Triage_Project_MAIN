@@ -1,5 +1,5 @@
-// main.js
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("DOM loaded - checking for dashboard elements...");
 
   // --- REGISTER BUTTON LOGIC ---
   const registerBtn = document.getElementById('registerBtn');
@@ -45,266 +45,422 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- PATIENT DASHBOARD LOGIC ---
-  function initializePatientDashboard() {
-    // Navigation buttons
-    const btnPatientInfo = document.getElementById('btnPatientInfo');
-    const btnQueue = document.getElementById('btnQueue');
-    const btnInTreatment = document.getElementById('btnInTreatment');
-    const btnNurseInfo = document.getElementById('btnNurseInfo');
-    
-    // Content sections
-    const patientInfoSection = document.getElementById('patientInfoSection');
-    const queueSection = document.getElementById('queueSection');
-    const inTreatmentSection = document.getElementById('inTreatmentSection');
-    
-    // Modals
-    const patientModal = document.getElementById('patientModal');
-    const nurseModal = document.getElementById('nurseModal');
-    
-    // Patient data (in real app, this would come from API)
-    const patientData = {
-      'P001': {
-        name: 'John Smith',
-        age: 45,
-        gender: 'Male',
-        triageLevel: 'Level 1',
-        symptoms: 'Chest pain, shortness of breath, sweating, nausea',
-        medicalHistory: 'Hypertension, high cholesterol. Previous heart attack in 2020. Family history of heart disease.'
-      },
-      'P002': {
-        name: 'Maria Garcia',
-        age: 32,
-        gender: 'Female',
-        triageLevel: 'Level 2',
-        symptoms: 'High fever (102°F), severe headache, neck stiffness, sensitivity to light',
-        medicalHistory: 'No significant medical history. Allergic to penicillin.'
-      },
-      'P003': {
-        name: 'Robert Johnson',
-        age: 28,
-        gender: 'Male',
-        triageLevel: 'Level 3',
-        symptoms: 'Minor cut on left forearm, bruising on right knee. Pain level 3/10.',
-        medicalHistory: 'Asthma, uses inhaler as needed. No surgeries.'
-      },
-      'P004': {
-        name: 'Sarah Wilson',
-        age: 65,
-        gender: 'Female',
-        triageLevel: 'Level 1',
-        symptoms: 'Unconscious, head injury from fall, unequal pupils',
-        medicalHistory: 'Diabetes type 2, osteoporosis. Previous hip replacement surgery.'
-      },
-      'P005': {
-        name: 'David Brown',
-        age: 38,
-        gender: 'Male',
-        triageLevel: 'Level 2',
-        symptoms: 'Severe abdominal pain, vomiting, fever, loss of appetite',
-        medicalHistory: 'Appendectomy in 2015. No other significant history.'
-      }
-    };
+  // ========================
+  // PATIENT DASHBOARD LOGIC
+  // ========================
+  
+  // Check if we're on the patient dashboard page FIRST
+  if (document.getElementById('btnPatientInfo')) {
+    console.log("Patient dashboard detected - initializing...");
+    initializePatientDashboard();
+  }
+});
 
-    // Only initialize if we're on the patient dashboard page
-    if (btnPatientInfo && patientInfoSection) {
-      // Navigation functionality
-      function showSection(section) {
-        // Hide all sections
-        if (patientInfoSection) patientInfoSection.classList.add('hidden');
-        if (queueSection) queueSection.classList.add('hidden');
-        if (inTreatmentSection) inTreatmentSection.classList.add('hidden');
-        
-        // Remove active class from all buttons
-        if (btnPatientInfo) btnPatientInfo.classList.remove('active');
-        if (btnQueue) btnQueue.classList.remove('active');
-        if (btnInTreatment) btnInTreatment.classList.remove('active');
-        
-        // Show selected section and activate button
-        switch(section) {
-          case 'patientInfo':
-            if (patientInfoSection) patientInfoSection.classList.remove('hidden');
-            if (btnPatientInfo) btnPatientInfo.classList.add('active');
-            break;
-          case 'queue':
-            if (queueSection) queueSection.classList.remove('hidden');
-            if (btnQueue) btnQueue.classList.add('active');
-            break;
-          case 'inTreatment':
-            if (inTreatmentSection) inTreatmentSection.classList.remove('hidden');
-            if (btnInTreatment) btnInTreatment.classList.add('active');
-            break;
-        }
-      }
+// PATIENT DASHBOARD FUNCTION (defined outside DOMContentLoaded)
+function initializePatientDashboard() {
+  console.log("Initializing patient dashboard...");
 
-      // Event listeners for navigation buttons
-      if (btnPatientInfo) {
-        btnPatientInfo.addEventListener('click', () => showSection('patientInfo'));
-      }
-      if (btnQueue) {
-        btnQueue.addEventListener('click', () => showSection('queue'));
-      }
-      if (btnInTreatment) {
-        btnInTreatment.addEventListener('click', () => showSection('inTreatment'));
-      }
+  // --- Navigation Buttons ---
+  const btnPatientInfo = document.getElementById('btnPatientInfo');
+  const btnQueue = document.getElementById('btnQueue');
+  const btnInTreatment = document.getElementById('btnInTreatment');
 
-      // Nurse info button
-      if (btnNurseInfo) {
-        btnNurseInfo.addEventListener('click', () => {
-          if (nurseModal) nurseModal.classList.remove('hidden');
-        });
-      }
+  // --- Content Sections ---
+  const patientInfoSection = document.getElementById('patientInfoSection');
+  const queueSection = document.getElementById('queueSection');
+  const inTreatmentSection = document.getElementById('inTreatmentSection');
 
-      // Patient info buttons
-      document.querySelectorAll('.info-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const patientId = this.getAttribute('data-patient');
-          const patient = patientData[patientId];
-          
-          if (patient && patientModal) {
-            // Populate modal with patient data
-            const modalPatientName = document.getElementById('modalPatientName');
-            const modalPatientId = document.getElementById('modalPatientId');
-            const modalTriageLevel = document.getElementById('modalTriageLevel');
-            const modalPatientAge = document.getElementById('modalPatientAge');
-            const modalPatientGender = document.getElementById('modalPatientGender');
-            const modalSymptoms = document.getElementById('modalSymptoms');
-            const modalMedicalHistory = document.getElementById('modalMedicalHistory');
-            
-            if (modalPatientName) modalPatientName.textContent = patient.name;
-            if (modalPatientId) modalPatientId.textContent = patientId;
-            if (modalTriageLevel) modalTriageLevel.textContent = patient.triageLevel;
-            if (modalPatientAge) modalPatientAge.textContent = patient.age;
-            if (modalPatientGender) modalPatientGender.textContent = patient.gender;
-            if (modalSymptoms) modalSymptoms.textContent = patient.symptoms;
-            if (modalMedicalHistory) modalMedicalHistory.textContent = patient.medicalHistory;
-            
-            // Show modal
-            patientModal.classList.remove('hidden');
-          }
-        });
-      });
+  // --- Patient Modal ---
+  const patientModal = document.getElementById('patientModal');
+  const closeModalBtn = document.getElementById('closeModalBtn');
 
-      // Modal tab functionality
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const tabName = this.getAttribute('data-tab');
-          
-          // Remove active class from all tabs
-          document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
-          document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-          
-          // Activate clicked tab
-          this.classList.add('active');
-          const tabPane = document.getElementById(tabName + 'Tab');
-          if (tabPane) tabPane.classList.add('active');
-        });
-      });
+  // --- Tab Buttons inside Modal ---
+  const modalTabBtns = document.querySelectorAll('.tab-btn');
+  const modalTabPanes = document.querySelectorAll('.tab-pane');
 
-      // Close modal buttons
-      document.querySelectorAll('.close-modal').forEach(btn => {
-        btn.addEventListener('click', function() {
-          if (patientModal) patientModal.classList.add('hidden');
-          if (nurseModal) nurseModal.classList.add('hidden');
-        });
-      });
+  // --- Admit / Discharge Buttons ---
+  const modalAdmitBtn = document.getElementById('modalAdmitBtn');
+  const modalDischargeBtn = document.getElementById('modalDischargeBtn');
 
-      // Close modal when clicking outside
-      if (patientModal) {
-        patientModal.addEventListener('click', function(e) {
-          if (e.target === this) {
-            this.classList.add('hidden');
-          }
-        });
-      }
-      
-      if (nurseModal) {
-        nurseModal.addEventListener('click', function(e) {
-          if (e.target === this) {
-            this.classList.add('hidden');
-          }
-        });
-      }
+  // --- Patient Tables ---
+  const patientTableBody = document.querySelector("#patientTable tbody");
+  const queueTableBody = document.querySelector("#queueTable tbody");
+  const inTreatmentTableBody = document.querySelector("#inTreatmentTable tbody");
 
-      // Admit to treatment buttons
-      document.querySelectorAll('.admit-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const patientId = this.getAttribute('data-patient');
-          const row = this.closest('tr');
-          if (row) {
-            const patientName = row.cells[1].textContent;
-            if (confirm(`Admit ${patientName} to treatment?`)) {
-              alert(`${patientName} has been admitted to treatment.`);
-              // In real application, this would update the backend
-            }
-          }
-        });
-      });
+  // Auto-refresh interval (30 seconds)
+  let refreshInterval;
+  const REFRESH_INTERVAL_MS = 30000; // 30 seconds
 
-      // Discharge buttons
-      document.querySelectorAll('.discharge-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const patientId = this.getAttribute('data-patient');
-          const row = this.closest('tr');
-          if (row) {
-            const patientName = row.cells[1].textContent;
-            if (confirm(`Discharge ${patientName}?`)) {
-              alert(`${patientName} has been discharged.`);
-              // In real application, this would update the backend
-            }
-          }
-        });
-      });
+  // Start auto-refresh
+  function startAutoRefresh() {
+    refreshInterval = setInterval(() => {
+      console.log("Auto-refreshing patient data...");
+      loadPatientsFromDatabase();
+    }, REFRESH_INTERVAL_MS);
+  }
 
-      // Initialize with patient info section visible
-      showSection('patientInfo');
-    }
-
-    // Legacy navigation for old dashboard style (if exists)
-    const navItems = document.querySelectorAll('.nav-item');
-    const tables = document.querySelectorAll('.table-container table');
-    
-    if (navItems.length > 0) {
-      navItems.forEach(item => {
-        item.addEventListener('click', function() {
-          // Remove active class from all items
-          navItems.forEach(nav => nav.classList.remove('active'));
-          
-          // Add active class to clicked item
-          this.classList.add('active');
-          
-          // Hide all tables
-          tables.forEach(table => table.classList.add('table-hidden'));
-          
-          // Show selected table
-          const target = this.getAttribute('data-target');
-          if (target) {
-            const targetTable = document.getElementById(target);
-            if (targetTable) targetTable.classList.remove('table-hidden');
-          }
-        });
-      });
-    }
-
-    // Legacy button functionality (if exists)
-    const btnAddPatient = document.getElementById('btnAddPatient');
-    const btnRefresh = document.getElementById('btnRefresh');
-
-    if (btnAddPatient) {
-      btnAddPatient.addEventListener('click', function() {
-        alert('Add Patient functionality would go here');
-      });
-    }
-
-    if (btnRefresh) {
-      btnRefresh.addEventListener('click', function() {
-        alert('Refreshing data...');
-        // In a real application, this would fetch updated data from the server
-      });
+  // Stop auto-refresh (if needed)
+  function stopAutoRefresh() {
+    if (refreshInterval) {
+      clearInterval(refreshInterval);
     }
   }
 
-  // Initialize patient dashboard
-  initializePatientDashboard();
+  // --- Fetch patients from database ---
+  async function loadPatientsFromDatabase() {
+    try {
+      console.log("Fetching patients from database...");
+      const response = await fetch('http://localhost:8080/er_triage_db/patients');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const patients = await response.json();
+      console.log("Patients fetched:", patients.length);
+      loadPatients(patients);
+      
+    } catch (error) {
+      console.error('Error fetching patients:', error);
+      // Fallback to sample data if database is unavailable
+      console.log("Using sample data as fallback...");
+      loadPatients(getSamplePatients());
+    }
+  }
 
-});
+  // --- Update patient status in database ---
+  async function updatePatientStatus(patientId, newStatus) {
+    try {
+      const response = await fetch(`http://localhost:8080/er_triage_db/patients/${patientId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: newStatus,
+          treatmentStart: newStatus === 'IN_TREATMENT' ? new Date().toLocaleTimeString() : null
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      console.log(`Patient ${patientId} status updated to ${newStatus}`);
+      return true;
+    } catch (error) {
+      console.error('Error updating patient status:', error);
+      return false;
+    }
+  }
+
+  // Sample data fallback
+  function getSamplePatients() {
+    return [
+      {
+        id: "1",
+        name: "Noura",
+        age: "70",
+        gender: "F",
+        triageLevel: 2,
+        symptoms: "Chest pain, shortness of breath",
+        status: "WAITING",
+        waitTime: "15 min",
+        treatmentStart: "",
+        currentMeds: "Aspirin",
+        medicalHistory: "Hypertension",
+        vitals: {
+          bpSys: "102",
+          bpDia: "65",
+          hr: "96",
+          rr: "22",
+          spo2: "93",
+          temp: "37.8"
+        },
+        triageScore: "8",
+        redFlag: "No",
+        triageReason: "SBP 102; SpO2 93%; chest pain",
+        createdAt: "2025-01-15 10:15:00",
+        updatedAt: "2025-01-15 10:15:00"
+      },
+      {
+        id: "2",
+        name: "Ali",
+        age: "30",
+        gender: "M",
+        triageLevel: 3,
+        symptoms: "Mild abdominal pain",
+        status: "WAITING",
+        waitTime: "25 min",
+        treatmentStart: "",
+        currentMeds: "None",
+        medicalHistory: "None",
+        vitals: {
+          bpSys: "120",
+          bpDia: "80",
+          hr: "88",
+          rr: "18",
+          spo2: "97",
+          temp: "37.0"
+        },
+        triageScore: "3",
+        redFlag: "No",
+        triageReason: "Stable vitals, mild abdominal pain",
+        createdAt: "2025-01-15 10:20:00",
+        updatedAt: "2025-01-15 10:20:00"
+      },
+      {
+        id: "3",
+        name: "Sara",
+        age: "55",
+        gender: "F",
+        triageLevel: 1,
+        symptoms: "Severe chest pain, sweating",
+        status: "IN_TREATMENT",
+        waitTime: "5 min",
+        treatmentStart: "10:30 AM",
+        currentMeds: "Metformin",
+        medicalHistory: "Diabetes Type 2",
+        vitals: {
+          bpSys: "85",
+          bpDia: "55",
+          hr: "120",
+          rr: "30",
+          spo2: "84",
+          temp: "38.2"
+        },
+        triageScore: "12",
+        redFlag: "Yes",
+        triageReason: "SpO2 84%; SBP 85; severe chest pain",
+        createdAt: "2025-01-15 10:25:00",
+        updatedAt: "2025-01-15 10:30:00"
+      }
+    ];
+  }
+
+  // --- Navigation Function ---
+  function showSection(section) {
+    console.log("Showing section:", section);
+    
+    // Hide all sections
+    if (patientInfoSection) patientInfoSection.classList.add('hidden');
+    if (queueSection) queueSection.classList.add('hidden');
+    if (inTreatmentSection) inTreatmentSection.classList.add('hidden');
+
+    // Remove active class from all buttons
+    if (btnPatientInfo) btnPatientInfo.classList.remove('active');
+    if (btnQueue) btnQueue.classList.remove('active');
+    if (btnInTreatment) btnInTreatment.classList.remove('active');
+
+    // Show selected section and activate button
+    switch(section) {
+      case 'patientInfo':
+        if (patientInfoSection) patientInfoSection.classList.remove('hidden');
+        if (btnPatientInfo) btnPatientInfo.classList.add('active');
+        break;
+      case 'queue':
+        if (queueSection) queueSection.classList.remove('hidden');
+        if (btnQueue) btnQueue.classList.add('active');
+        break;
+      case 'inTreatment':
+        if (inTreatmentSection) inTreatmentSection.classList.remove('hidden');
+        if (btnInTreatment) btnInTreatment.classList.add('active');
+        break;
+    }
+  }
+
+  // --- Attach Navigation Events ---
+  if (btnPatientInfo) {
+    btnPatientInfo.addEventListener('click', () => showSection('patientInfo'));
+    console.log("Patient Info button event attached");
+  }
+  if (btnQueue) {
+    btnQueue.addEventListener('click', () => showSection('queue'));
+    console.log("Queue button event attached");
+  }
+  if (btnInTreatment) {
+    btnInTreatment.addEventListener('click', () => showSection('inTreatment'));
+    console.log("In-Treatment button event attached");
+  }
+
+  // --- Function to Populate Patient Tables ---
+  function loadPatients(patients) {
+    console.log("Loading patients:", patients.length);
+    
+    // Clear tables
+    if (patientTableBody) patientTableBody.innerHTML = '';
+    if (queueTableBody) queueTableBody.innerHTML = '';
+    if (inTreatmentTableBody) inTreatmentTableBody.innerHTML = '';
+
+    patients.forEach(patient => {
+      // Convert database status to display status
+      const displayStatus = patient.status === 'WAITING' ? 'Waiting' : 
+                           patient.status === 'IN_TREATMENT' ? 'In Treatment' : 'Treated';
+
+      // Calculate wait time (simplified - you can enhance this)
+      const waitTime = patient.status === 'WAITING' ? 
+        (Math.floor(Math.random() * 30) + 5) + ' min' : '-';
+
+      // --- Patient Info Table (All Patients) ---
+      if (patientTableBody) {
+        const rowPatient = document.createElement('tr');
+        rowPatient.innerHTML = `
+          <td>${patient.id}</td>
+          <td>${patient.name}</td>
+          <td><span class="triage-level level-${patient.triageLevel}">Level ${patient.triageLevel}</span></td>
+          <td>${patient.symptom || patient.symptoms}</td>
+          <td class="text-right"><button class="info-btn" data-patient-id="${patient.id}">View</button></td>
+        `;
+        patientTableBody.appendChild(rowPatient);
+      }
+
+      // --- Queue Table (Level 2 & 3, waiting) ---
+      if (queueTableBody && patient.triageLevel >= 2 && patient.status === "WAITING") {
+        const rowQueue = document.createElement('tr');
+        rowQueue.innerHTML = `
+          <td>${patient.id}</td>
+          <td>${patient.name}</td>
+          <td><span class="triage-level level-${patient.triageLevel}">Level ${patient.triageLevel}</span></td>
+          <td>${patient.symptom || patient.symptoms}</td>
+          <td>${waitTime}</td>
+          <td><button class="info-btn" data-patient-id="${patient.id}">View</button></td>
+        `;
+        queueTableBody.appendChild(rowQueue);
+      }
+
+      // --- In-Treatment Table (Level 1, in treatment) ---
+      if (inTreatmentTableBody && patient.triageLevel === 1 && patient.status === "IN_TREATMENT") {
+        const rowTreatment = document.createElement('tr');
+        rowTreatment.innerHTML = `
+          <td>${patient.id}</td>
+          <td>${patient.name}</td>
+          <td><span class="triage-level level-${patient.triageLevel}">Level ${patient.triageLevel}</span></td>
+          <td>${patient.symptom || patient.symptoms}</td>
+          <td>${patient.treatmentStart || '-'}</td>
+          <td><button class="info-btn" data-patient-id="${patient.id}">View</button></td>
+        `;
+        inTreatmentTableBody.appendChild(rowTreatment);
+      }
+    });
+
+    console.log("Tables populated, attaching modal events...");
+
+    // --- Attach Modal Event to all info buttons ---
+    document.querySelectorAll('.info-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const patientId = btn.getAttribute('data-patient-id');
+        const patient = patients.find(p => p.id == patientId);
+        console.log("View button clicked for patient:", patientId, patient);
+        if (patient) showPatientModal(patient);
+      });
+    });
+  }
+
+  // --- Show Patient Modal ---
+  function showPatientModal(patient) {
+    console.log("Showing modal for patient:", patient.name);
+    
+    // Update modal content
+    const modalPatientName = document.getElementById('modalPatientName');
+    const modalPatientId = document.getElementById('modalPatientId');
+    const modalPatientAge = document.getElementById('modalPatientAge');
+    const modalPatientGender = document.getElementById('modalPatientGender');
+    const modalTriageLevel = document.getElementById('modalTriageLevel');
+    const modalSymptoms = document.getElementById('modalSymptoms');
+    const modalCurrentMeds = document.getElementById('modalCurrentMeds');
+    const modalPastHistory = document.getElementById('modalPastHistory');
+    const modalBpSys = document.getElementById('modalBpSys');
+    const modalBpDia = document.getElementById('modalBpDia');
+    const modalHr = document.getElementById('modalHr');
+    const modalRr = document.getElementById('modalRr');
+    const modalSpo2 = document.getElementById('modalSpo2');
+    const modalTemp = document.getElementById('modalTemp');
+    const modalTriageScore = document.getElementById('modalTriageScore');
+    const modalRedFlag = document.getElementById('modalRedFlag');
+    const modalTriageReason = document.getElementById('modalTriageReason');
+    const modalCreatedAt = document.getElementById('modalCreatedAt');
+    const modalUpdatedAt = document.getElementById('modalUpdatedAt');
+    const modalStatus = document.getElementById('modalStatus');
+
+    if (modalPatientName) modalPatientName.textContent = patient.name || '-';
+    if (modalPatientId) modalPatientId.textContent = patient.id || '-';
+    if (modalPatientAge) modalPatientAge.textContent = patient.age || '-';
+    if (modalPatientGender) modalPatientGender.textContent = patient.gender === 'M' ? 'Male' : patient.gender === 'F' ? 'Female' : 'Other';
+    if (modalTriageLevel) modalTriageLevel.textContent = patient.triageLevel || '-';
+    if (modalSymptoms) modalSymptoms.textContent = patient.symptom || patient.symptoms || '-';
+    if (modalCurrentMeds) modalCurrentMeds.textContent = patient.current_medications || patient.currentMeds || '-';
+    if (modalPastHistory) modalPastHistory.textContent = patient.past_medical_history || patient.medicalHistory || '-';
+    if (modalBpSys) modalBpSys.textContent = patient.bp_sys || patient.vitals?.bpSys || '-';
+    if (modalBpDia) modalBpDia.textContent = patient.bp_dia || patient.vitals?.bpDia || '-';
+    if (modalHr) modalHr.textContent = patient.hr || patient.vitals?.hr || '-';
+    if (modalRr) modalRr.textContent = patient.rr || patient.vitals?.rr || '-';
+    if (modalSpo2) modalSpo2.textContent = patient.spo2 || patient.vitals?.spo2 || '-';
+    if (modalTemp) modalTemp.textContent = patient.temp || patient.vitals?.temp || '-';
+    if (modalTriageScore) modalTriageScore.textContent = patient.triage_score || patient.triageScore || '-';
+    if (modalRedFlag) modalRedFlag.textContent = patient.red_flag ? 'Yes' : patient.redFlag || 'No';
+    if (modalTriageReason) modalTriageReason.textContent = patient.triage_reason || patient.triageReason || '-';
+    if (modalCreatedAt) modalCreatedAt.textContent = patient.created_at || patient.createdAt || '-';
+    if (modalUpdatedAt) modalUpdatedAt.textContent = patient.updated_at || patient.updatedAt || '-';
+    if (modalStatus) modalStatus.textContent = patient.status === 'WAITING' ? 'Waiting' : 
+                                              patient.status === 'IN_TREATMENT' ? 'In Treatment' : 'Treated';
+
+    // Show/hide admit/discharge buttons based on status
+    if (modalAdmitBtn) {
+      modalAdmitBtn.style.display = patient.status === "IN_TREATMENT" ? "none" : "inline-block";
+      modalAdmitBtn.onclick = async () => {
+        const success = await updatePatientStatus(patient.id, 'IN_TREATMENT');
+        if (success) {
+          loadPatientsFromDatabase(); // Refresh data
+        }
+        if (patientModal) patientModal.classList.add('hidden');
+      };
+    }
+
+    if (modalDischargeBtn) {
+      modalDischargeBtn.style.display = patient.status === "WAITING" ? "none" : "inline-block";
+      modalDischargeBtn.onclick = async () => {
+        const success = await updatePatientStatus(patient.id, 'TREATED');
+        if (success) {
+          loadPatientsFromDatabase(); // Refresh data
+        }
+        if (patientModal) patientModal.classList.add('hidden');
+      };
+    }
+
+    if (patientModal) {
+      patientModal.classList.remove('hidden');
+    }
+  }
+
+  // --- Modal Tab Switching ---
+  modalTabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      modalTabBtns.forEach(b => b.classList.remove('active'));
+      modalTabPanes.forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      const tabName = btn.getAttribute('data-tab');
+      const tabPane = document.getElementById(tabName);
+      if (tabPane) tabPane.classList.add('active');
+    });
+  });
+
+  // --- Close Modal ---
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener('click', () => {
+      if (patientModal) patientModal.classList.add('hidden');
+    });
+  }
+
+  // --- Click outside modal to close ---
+  if (patientModal) {
+    patientModal.addEventListener('click', e => {
+      if (e.target === patientModal) patientModal.classList.add('hidden');
+    });
+  }
+
+  // Initialize dashboard
+  loadPatientsFromDatabase(); // Load from database first
+  showSection('patientInfo');
+  startAutoRefresh(); // Start auto-refresh
+  console.log("Patient dashboard initialized successfully with auto-refresh");
+}

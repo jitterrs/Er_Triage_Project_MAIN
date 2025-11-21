@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Patient Dashboard | Hospital Triage System</title>
   <link rel="stylesheet" href="style.css" />
   <script src="main.js" defer></script>
 </head>
 <body>
-
   <!-- UNIVERSAL HEADER -->
   <header class="main-header">
     <div class="header-content">
@@ -28,14 +27,12 @@
 
     <!-- Main Content Area -->
     <div class="dashboard-content">
-      <!-- Top Right Nurse Info Button -->
-      <div class="top-right-controls">
-      </div>
+      <!-- REMOVED REFRESH BUTTON SECTION -->
 
       <!-- Patient Info Table -->
       <div id="patientInfoSection" class="content-section">
         <div class="table-container">
-          <table>
+          <table id="patientTable">
             <thead>
               <tr>
                 <th>ID</th>
@@ -46,51 +43,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>P001</td>
-                <td>John Smith</td>
-                <td><span class="triage-level level-1">Level 1</span></td>
-                <td>Chest pain, shortness of breath</td>
-                <td class="text-right">
-                  <button class="info-btn" data-patient="P001">?</button>
-                </td>
-              </tr>
-              <tr>
-                <td>P002</td>
-                <td>Maria Garcia</td>
-                <td><span class="triage-level level-2">Level 2</span></td>
-                <td>Fever, severe headache</td>
-                <td class="text-right">
-                  <button class="info-btn" data-patient="P002">?</button>
-                </td>
-              </tr>
-              <tr>
-                <td>P003</td>
-                <td>Robert Johnson</td>
-                <td><span class="triage-level level-3">Level 3</span></td>
-                <td>Minor cut, bruising</td>
-                <td class="text-right">
-                  <button class="info-btn" data-patient="P003">?</button>
-                </td>
-              </tr>
-              <tr>
-                <td>P004</td>
-                <td>Sarah Wilson</td>
-                <td><span class="triage-level level-1">Level 1</span></td>
-                <td>Unconscious, head injury</td>
-                <td class="text-right">
-                  <button class="info-btn" data-patient="P004">?</button>
-                </td>
-              </tr>
-              <tr>
-                <td>P005</td>
-                <td>David Brown</td>
-                <td><span class="triage-level level-2">Level 2</span></td>
-                <td>Abdominal pain, vomiting</td>
-                <td class="text-right">
-                  <button class="info-btn" data-patient="P005">?</button>
-                </td>
-              </tr>
+              <!-- rows injected by JS -->
             </tbody>
           </table>
         </div>
@@ -99,7 +52,7 @@
       <!-- Queue Table (Level 2 & 3 only) -->
       <div id="queueSection" class="content-section hidden">
         <div class="table-container">
-          <table>
+          <table id="queueTable">
             <thead>
               <tr>
                 <th>ID</th>
@@ -111,36 +64,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>P002</td>
-                <td>Maria Garcia</td>
-                <td><span class="triage-level level-2">Level 2</span></td>
-                <td>Fever, severe headache</td>
-                <td>15 min</td>
-                <td class="text-right">
-                  <button class="action-btn admit-btn" data-patient="P002">Admit to Treatment</button>
-                </td>
-              </tr>
-              <tr>
-                <td>P003</td>
-                <td>Robert Johnson</td>
-                <td><span class="triage-level level-3">Level 3</span></td>
-                <td>Minor cut, bruising</td>
-                <td>25 min</td>
-                <td class="text-right">
-                  <button class="action-btn admit-btn" data-patient="P003">Admit to Treatment</button>
-                </td>
-              </tr>
-              <tr>
-                <td>P005</td>
-                <td>David Brown</td>
-                <td><span class="triage-level level-2">Level 2</span></td>
-                <td>Abdominal pain, vomiting</td>
-                <td>8 min</td>
-                <td class="text-right">
-                  <button class="action-btn admit-btn" data-patient="P005">Admit to Treatment</button>
-                </td>
-              </tr>
+              <!-- rows injected by JS -->
             </tbody>
           </table>
         </div>
@@ -149,7 +73,7 @@
       <!-- In-Treatment Table (Level 1 only) -->
       <div id="inTreatmentSection" class="content-section hidden">
         <div class="table-container">
-          <table>
+          <table id="inTreatmentTable">
             <thead>
               <tr>
                 <th>ID</th>
@@ -161,26 +85,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>P001</td>
-                <td>John Smith</td>
-                <td><span class="triage-level level-1">Level 1</span></td>
-                <td>Chest pain, shortness of breath</td>
-                <td>10:15 AM</td>
-                <td class="text-right">
-                  <button class="action-btn discharge-btn" data-patient="P001">Discharge</button>
-                </td>
-              </tr>
-              <tr>
-                <td>P004</td>
-                <td>Sarah Wilson</td>
-                <td><span class="triage-level level-1">Level 1</span></td>
-                <td>Unconscious, head injury</td>
-                <td>10:05 AM</td>
-                <td class="text-right">
-                  <button class="action-btn discharge-btn" data-patient="P004">Discharge</button>
-                </td>
-              </tr>
+              <!-- rows injected by JS -->
             </tbody>
           </table>
         </div>
@@ -189,11 +94,11 @@
   </div>
 
   <!-- Patient Detail Modal -->
-  <div id="patientModal" class="modal hidden">
-    <div class="modal-content">
+  <div id="patientModal" class="modal hidden" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-content" role="document">
       <div class="modal-header">
-        <h3>Patient Full Information</h3>
-        <button class="close-modal">&times;</button>
+        <h3 id="modalTitle">Patient Full Information</h3>
+        <button class="close-modal" id="closeModalBtn">&times;</button>
       </div>
       <div class="modal-body">
         <div class="patient-basic-info">
@@ -204,8 +109,8 @@
               <span id="modalPatientId" class="info-value">-</span>
             </div>
             <div class="info-item">
-              <span class="info-label">Triage Level:</span>
-              <span id="modalTriageLevel" class="info-value">-</span>
+              <span class="info-label">National ID:</span>
+              <span id="modalNationalId" class="info-value">-</span>
             </div>
             <div class="info-item">
               <span class="info-label">Age:</span>
@@ -215,27 +120,104 @@
               <span class="info-label">Gender:</span>
               <span id="modalPatientGender" class="info-value">-</span>
             </div>
+            <div class="info-item">
+              <span class="info-label">Phone:</span>
+              <span id="modalPatientPhone" class="info-value">-</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Status:</span>
+              <span id="modalStatus" class="info-value">-</span>
+            </div>
           </div>
         </div>
-        
+
         <div class="modal-tabs">
-          <button class="tab-btn active" data-tab="symptoms">Current Symptoms</button>
+          <button class="tab-btn active" data-tab="vitals">Vitals</button>
+          <button class="tab-btn" data-tab="symptoms">Symptoms</button>
           <button class="tab-btn" data-tab="history">Medical History</button>
+          <button class="tab-btn" data-tab="triage">Triage Details</button>
         </div>
-        
+
         <div class="tab-content">
-          <div id="symptomsTab" class="tab-pane active">
+          <div id="vitals" class="tab-pane active">
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">BP (Systolic):</span>
+                <span id="modalBpSys" class="info-value">-</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">BP (Diastolic):</span>
+                <span id="modalBpDia" class="info-value">-</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Heart Rate (HR):</span>
+                <span id="modalHr" class="info-value">-</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Resp Rate (RR):</span>
+                <span id="modalRr" class="info-value">-</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">SpO2 (%):</span>
+                <span id="modalSpo2" class="info-value">-</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Temp (°C):</span>
+                <span id="modalTemp" class="info-value">-</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="symptoms" class="tab-pane">
             <p id="modalSymptoms">-</p>
           </div>
-          <div id="historyTab" class="tab-pane">
-            <p id="modalMedicalHistory">-</p>
+
+          <div id="history" class="tab-pane">
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Current Medications:</span>
+                <span id="modalCurrentMeds" class="info-value">-</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Past Medical History:</span>
+                <span id="modalPastHistory" class="info-value">-</span>
+              </div>
+            </div>
           </div>
+
+          <div id="triage" class="tab-pane">
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Triage Level:</span>
+                <span id="modalTriageLevel" class="info-value">-</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Triage Score:</span>
+                <span id="modalTriageScore" class="info-value">-</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Red Flag:</span>
+                <span id="modalRedFlag" class="info-value">-</span>
+              </div>
+              <div class="info-item" style="grid-column:1 / -1;">
+                <span class="info-label">Triage Reason:</span>
+                <span id="modalTriageReason" class="info-value">-</span>
+              </div>
+            </div>
+            <div style="margin-top:16px; font-size:13px; color:#666;">
+              <div>Created at: <span id="modalCreatedAt">-</span></div>
+              <div>Updated at: <span id="modalUpdatedAt">-</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:18px; display:flex; gap:10px; justify-content:flex-end;">
+          <button id="modalAdmitBtn" class="action-btn admit-btn">Admit to Treatment</button>
+          <button id="modalDischargeBtn" class="action-btn discharge-btn">Discharge</button>
         </div>
       </div>
     </div>
   </div>
-
-
 
   <!-- UNIVERSAL FOOTER -->
   <footer class="main-footer">
@@ -244,6 +226,5 @@
       <p>© 2025 Hospital Triage System. All rights reserved.</p>
     </div>
   </footer>
-
 </body>
 </html>
