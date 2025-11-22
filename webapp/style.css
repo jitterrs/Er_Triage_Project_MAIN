@@ -159,8 +159,8 @@ body {
    ========================================================= */
 .register-box {
   display: none;
-  width: 500px;
-  padding: 50px;
+  width: 700px;
+  padding: 40px;
   border-radius: 15px;
   position: fixed;
   top: 50%;
@@ -171,49 +171,159 @@ body {
   box-shadow: 0 15px 40px rgba(0,0,0,0.25);
   border: 1px solid #ccc;
   box-sizing: border-box;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .register-box h2 {
-  margin-bottom: 30px;
+  margin-bottom: 25px;
+  text-align: center;
+  color: #1a6bc4;
+  font-size: 1.8rem;
 }
 
-.register-box input,
-.register-box textarea {
-  width: 100%;
-  padding: 10px;
-  margin: 12px 0;
+/* Form Section Styling */
+.form-section {
+  background: #f8faff;
+  padding: 20px;
   border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-  box-sizing: border-box;
+  border-left: 4px solid #1a6bc4;
+  margin: 15px 0;
 }
 
-.register-box textarea {
-  min-height: 80px;
+.form-section h3 {
+  color: #1a6bc4;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+  border-bottom: 2px solid #e1e8f7;
+  padding-bottom: 8px;
+}
+
+/* Form Row Styling for all fields */
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 12px 0;
+  padding: 8px 0;
+}
+
+.form-row input[type="text"],
+.form-row input[type="number"],
+.form-row input[type="datetime-local"],
+.form-row textarea,
+.form-row select {
+  flex: 2;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  min-width: 200px;
+  font-family: 'Segoe UI', sans-serif;
+  transition: all 0.3s;
+}
+
+.form-row textarea {
+  min-height: 60px;
   resize: vertical;
 }
 
-.register-box .register-buttons {
+.form-row select {
+  background: white;
+  cursor: pointer;
+}
+
+.form-row label {
+  flex: 1;
+  font-weight: 600;
+  color: #444;
+  min-width: 150px;
+}
+
+/* Focus states */
+.form-row input:focus,
+.form-row textarea:focus,
+.form-row select:focus {
+  border-color: #1a6bc4;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(26, 107, 196, 0.2);
+}
+
+/* None Option Styling */
+.none-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 100px;
+}
+
+.none-option input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.none-option label {
+  font-weight: normal;
+  min-width: auto;
+  cursor: pointer;
+}
+
+/* Disabled field styling */
+input:disabled, textarea:disabled, select:disabled {
+  background-color: #f8f9fa !important;
+  color: #6c757d !important;
+  cursor: not-allowed !important;
+  border-color: #dee2e6 !important;
+}
+
+.form-buttons {
   display: flex;
   gap: 15px;
   margin-top: 20px;
 }
 
-.register-box button {
+.form-buttons button {
   flex: 1;
   padding: 15px;
-  border-radius: 10px;
+  border-radius: 8px;
   border: none;
-  background: #007bff;
-  color: #fff;
-  font-size: 18px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
 }
 
-.register-box button:hover {
-  background: #0056b3;
-  transform: scale(1.05);
+#newRegisterBtn {
+  background: linear-gradient(135deg, #1a6bc4 0%, #0d4d9c 100%);
+  color: white;
+}
+
+#newRegisterBtn:hover {
+  background: linear-gradient(135deg, #0d4d9c 0%, #1a6bc4 100%);
+  transform: translateY(-2px);
+}
+
+#cancelRegister {
+  background: #f0f0f0;
+  color: #666;
+}
+
+#cancelRegister:hover {
+  background: #e0e0e0;
+}
+
+/* Overlay for modal background */
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
 }
 
 /* =========================================================
@@ -652,6 +762,24 @@ tr:hover {
     padding: 30px;
   }
   
+  .form-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .form-row label,
+  .form-row input,
+  .form-row textarea,
+  .form-row select,
+  .none-option {
+    width: 100%;
+  }
+  
+  .form-buttons {
+    flex-direction: column;
+  }
+  
   .dashboard-center {
     width: 95%;
   }
@@ -685,5 +813,22 @@ tr:hover {
   
   .modal-header {
     padding: 15px;
+  }
+  
+  .dashboard-box h2 {
+    font-size: 28px;
+  }
+  
+  .dashboard-box button {
+    padding: 20px;
+    font-size: 22px;
+  }
+  
+  .form-section {
+    padding: 15px;
+  }
+  
+  .form-section h3 {
+    font-size: 1.1rem;
   }
 }
