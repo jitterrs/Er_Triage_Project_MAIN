@@ -1,6 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOM loaded - checking for dashboard elements...");
 
+  // --- ACCESSIBILITY FUNCTIONALITY ---
+  initializeAccessibility();
+
   // --- REGISTER BUTTON LOGIC ---
   const registerBtn = document.getElementById('registerBtn');
   const registerBox = document.getElementById('registerBox');
@@ -228,6 +231,149 @@ document.addEventListener("DOMContentLoaded", () => {
     initializePatientDashboard();
   }
 });
+
+// ACCESSIBILITY FUNCTIONALITY
+function initializeAccessibility() {
+  console.log("Initializing accessibility features...");
+  
+  const toggleBtn = document.getElementById('accessibilityToggle');
+  const panel = document.getElementById('accessibilityPanel');
+  const brightnessSlider = document.getElementById('brightnessSlider');
+  const brightnessValue = document.getElementById('brightnessValue');
+  
+  if (!toggleBtn || !panel) {
+    console.log("Accessibility elements not found");
+    return;
+  }
+
+  // Toggle panel visibility
+  toggleBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    panel.classList.toggle('accessibility-hidden');
+    console.log("Accessibility panel toggled");
+  });
+
+  // Brightness control - Apply to entire page
+  if (brightnessSlider && brightnessValue) {
+    brightnessSlider.addEventListener('input', function() {
+      const brightness = this.value;
+      brightnessValue.textContent = brightness + '%';
+      
+      // Apply brightness to the entire page
+      document.documentElement.style.filter = `brightness(${brightness}%)`;
+      console.log("Brightness set to:", brightness + '%');
+    });
+  }
+
+  // High contrast mode
+  const highContrastCheckbox = document.getElementById('highContrast');
+  if (highContrastCheckbox) {
+    highContrastCheckbox.addEventListener('change', function(e) {
+      if (e.target.checked) {
+        document.body.classList.add('high-contrast');
+        console.log("High contrast mode enabled");
+      } else {
+        document.body.classList.remove('high-contrast');
+        console.log("High contrast mode disabled");
+      }
+    });
+  }
+
+  // Large text mode
+  const largeTextCheckbox = document.getElementById('largeText');
+  if (largeTextCheckbox) {
+    largeTextCheckbox.addEventListener('change', function(e) {
+      if (e.target.checked) {
+        document.body.classList.add('large-text');
+        console.log("Large text mode enabled");
+      } else {
+        document.body.classList.remove('large-text');
+        console.log("Large text mode disabled");
+      }
+    });
+  }
+
+  // Reduce motion
+  const reduceMotionCheckbox = document.getElementById('reduceMotion');
+  if (reduceMotionCheckbox) {
+    reduceMotionCheckbox.addEventListener('change', function(e) {
+      if (e.target.checked) {
+        document.body.classList.add('reduced-motion');
+        console.log("Reduced motion enabled");
+      } else {
+        document.body.classList.remove('reduced-motion');
+        console.log("Reduced motion disabled");
+      }
+    });
+  }
+
+  // Reduce brightness checkbox
+  const reduceBrightnessCheckbox = document.getElementById('reduceBrightness');
+  if (reduceBrightnessCheckbox && brightnessSlider) {
+    reduceBrightnessCheckbox.addEventListener('change', function(e) {
+      if (e.target.checked) {
+        brightnessSlider.value = 70;
+        if (brightnessValue) brightnessValue.textContent = '70%';
+        document.documentElement.style.filter = 'brightness(70%)';
+        console.log("Brightness reduced to 70%");
+      } else {
+        brightnessSlider.value = 100;
+        if (brightnessValue) brightnessValue.textContent = '100%';
+        document.documentElement.style.filter = 'brightness(100%)';
+        console.log("Brightness reset to 100%");
+      }
+    });
+  }
+
+  // Close panel when clicking outside
+  document.addEventListener('click', function(e) {
+    if (panel && !panel.contains(e.target) && !toggleBtn.contains(e.target) && !panel.classList.contains('accessibility-hidden')) {
+      panel.classList.add('accessibility-hidden');
+      console.log("Accessibility panel closed (click outside)");
+    }
+  });
+
+  // Close panel with Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && panel && !panel.classList.contains('accessibility-hidden')) {
+      panel.classList.add('accessibility-hidden');
+      console.log("Accessibility panel closed (Escape key)");
+    }
+  });
+
+  console.log("Accessibility features initialized");
+}
+
+// Reset all accessibility settings
+function resetAccessibility() {
+  console.log("Resetting all accessibility settings");
+  
+  // Reset brightness on entire page
+  document.documentElement.style.filter = 'brightness(100%)';
+  document.body.classList.remove('high-contrast', 'large-text', 'reduced-motion');
+  
+  // Reset checkboxes
+  const reduceBrightnessCheckbox = document.getElementById('reduceBrightness');
+  const highContrastCheckbox = document.getElementById('highContrast');
+  const largeTextCheckbox = document.getElementById('largeText');
+  const reduceMotionCheckbox = document.getElementById('reduceMotion');
+  
+  if (reduceBrightnessCheckbox) reduceBrightnessCheckbox.checked = false;
+  if (highContrastCheckbox) highContrastCheckbox.checked = false;
+  if (largeTextCheckbox) largeTextCheckbox.checked = false;
+  if (reduceMotionCheckbox) reduceMotionCheckbox.checked = false;
+  
+  // Reset slider
+  const brightnessSlider = document.getElementById('brightnessSlider');
+  const brightnessValue = document.getElementById('brightnessValue');
+  
+  if (brightnessSlider) brightnessSlider.value = 100;
+  if (brightnessValue) brightnessValue.textContent = '100%';
+  
+  // Close panel
+  const panel = document.getElementById('accessibilityPanel');
+  if (panel) panel.classList.add('accessibility-hidden');
+}
 
 // PATIENT DASHBOARD FUNCTION (defined outside DOMContentLoaded)
 function initializePatientDashboard() {

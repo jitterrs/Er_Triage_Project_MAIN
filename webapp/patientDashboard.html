@@ -8,6 +8,48 @@
   <script src="main.js" defer></script>
 </head>
 <body>
+  <!-- ACCESSIBILITY TOGGLE -->
+  <button class="accessibility-toggle" id="accessibilityToggle" aria-label="Accessibility Options">
+    ♿
+  </button>
+
+  <!-- ACCESSIBILITY PANEL -->
+  <div class="accessibility-panel accessibility-hidden" id="accessibilityPanel">
+    <h3 style="margin-top: 0; margin-bottom: 15px;">Accessibility Options</h3>
+    
+    <div class="accessibility-option">
+      <input type="checkbox" id="reduceBrightness">
+      <label for="reduceBrightness">Reduce Brightness</label>
+    </div>
+
+    <div class="accessibility-option">
+      <input type="checkbox" id="highContrast">
+      <label for="highContrast">High Contrast Mode</label>
+    </div>
+
+    <div class="accessibility-option">
+      <input type="checkbox" id="largeText">
+      <label for="largeText">Large Text</label>
+    </div>
+
+    <div class="accessibility-option">
+      <input type="checkbox" id="reduceMotion">
+      <label for="reduceMotion">Reduce Motion</label>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="brightnessSlider">Brightness:</label>
+      <input type="range" id="brightnessSlider" min="50" max="100" value="100">
+      <span id="brightnessValue">100%</span>
+    </div>
+
+    <div class="accessibility-option">
+      <button onclick="resetAccessibility()" style="background: #e74c3c; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+        Reset All
+      </button>
+    </div>
+  </div>
+
   <!-- UNIVERSAL HEADER -->
   <header class="main-header">
     <div class="header-content">
