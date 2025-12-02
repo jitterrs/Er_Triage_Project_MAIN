@@ -51,7 +51,7 @@ public class PatientController {
 
     // 7.1.6 changeStatus()
     public PatientView changeStatus(long id, ChangeStatusRequest req) {
-        validationService.validateStatusChange(null, req.getNewStatus()); // optional
+        // if you want, you can call validateStatusChange here once you know old status
         return patientService.changeStatus(id, req);
     }
 }
