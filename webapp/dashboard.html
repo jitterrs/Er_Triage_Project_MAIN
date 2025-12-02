@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>ER Triage System Dashboard</title>
+</head>
+
+<body>
+  <!-- HEADER -->
+  <header class="main-header">
+    <div class="header-content">
+      <img src="/webapp/images/xCGUQrew_400x400.jpg" alt="Hospital Logo" class="logo">
+      <h1>Hospital Triage System</h1>
+    </div>
+  </header>
+
+  <!-- DASHBOARD CONTAINER CENTERED -->
+  <div class="dashboard-center">
+    <div class="dashboard-box">
+      <h2>ER Triage System</h2>
+      <button id="viewBtn">View Patients</button>
+      <button id="registerBtn">Register Patient</button>
+    </div>
+  </div>
+
+  <!-- REGISTER POPUP BOX -->
+  <div class="register-box" id="registerBox">
+    <h2>Register Patient</h2>
+    <form id="patientForm">
+      
+      <!-- Basic Information Section -->
+      <div class="form-section">
+        <h3>Basic Information</h3>
+        
+        <!-- Patient Name -->
+        <div class="form-row">
+          <input type="text" name="patientName" placeholder="Patient Name" required>
+          <div class="none-option">
+            <input type="checkbox" id="name-none" name="name-none">
+            <label for="name-none">None</label>
+          </div>
+        </div>
+        
+        <!-- Patient ID -->
+        <div class="form-row">
+          <input type="text" name="patientId" placeholder="Patient ID" required>
+          <div class="none-option">
+
+          </div>
+        </div>
+        
+        <!-- Age -->
+        <div class="form-row">
+          <input type="number" name="age" placeholder="Age" min="0" max="200" required>
+          <div class="none-option">
+            <input type="checkbox" id="age-none" name="age-none">
+            <label for="age-none">None</label>
+          </div>
+        </div>
+        
+        <!-- Gender -->
+        <div class="form-row">
+          <select name="gender" required>
+            <option value="">Select Gender</option>
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+          </select>
+          <div class="none-option">
+          </div>
+        </div>
+      </div>
+
+      <!-- Medical Information Section -->
+      <div class="form-section">
+        <h3>Medical Information</h3>
+        
+        <!-- Symptoms -->
+        <div class="form-row">
+          <textarea name="symptoms" placeholder="Symptoms" required></textarea>
+          <div class="none-option">
+            <input type="checkbox" id="symptoms-none" name="symptoms-none">
+            <label for="symptoms-none">None</label>
+          </div>
+        </div>
+        
+        <!-- Current Medications -->
+        <div class="form-row">
+          <textarea name="currentMeds" placeholder="Current Medications"></textarea>
+          <div class="none-option">
+            <input type="checkbox" id="meds-none" name="meds-none">
+            <label for="meds-none">None</label>
+          </div>
+        </div>
+        
+        <!-- Medical History -->
+        <div class="form-row">
+          <textarea name="medicalHistory" placeholder="Past Medical History"></textarea>
+          <div class="none-option">
+            <input type="checkbox" id="history-none" name="history-none">
+            <label for="history-none">None</label>
+          </div>
+        </div>
+        
+        <!-- Triage Level -->
+        <div class="form-row">
+        
+          <div class="none-option">
+          </div>
+        </div>
+        
+        <!-- Red Flag -->
+        <div class="form-row">
+          <select name="redFlag">
+            <option value="">Red Flag Present?</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+          <div class="none-option">
+            <input type="checkbox" id="redflag-none" name="redflag-none">
+            <label for="redflag-none">None</label>
+          </div>
+        </div>
+        
+        <!-- Triage Reason -->
+        <div class="form-row">
+          <textarea name="triageReason" placeholder="Triage Reason"></textarea>
+          <div class="none-option">
+            <input type="checkbox" id="reason-none" name="reason-none">
+            <label for="reason-none">None</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vitals Section -->
+      <div class="form-section">
+        <h3>Vital Signs</h3>
+        
+        <!-- Blood Pressure -->
+        <div class="form-row">
+          <label>Blood Pressure (mmHg)</label>
+          <input type="text" name="bp" placeholder="e.g., 120/80">
+          <div class="none-option">
+            <input type="checkbox" id="bp-none" name="bp-none">
+            <label for="bp-none">None</label>
+          </div>
+        </div>
+        
+        <!-- Heart Rate -->
+        <div class="form-row">
+          <label>Heart Rate (bpm)</label>
+          <input type="number" name="hr" placeholder="e.g., 75" min="30" max="200">
+          <div class="none-option">
+            <input type="checkbox" id="hr-none" name="hr-none">
+            <label for="hr-none">None</label>
+          </div>
+        </div>
+        
+        <!-- Respiratory Rate -->
+        <div class="form-row">
+          <label>Respiratory Rate (breaths/min)</label>
+          <input type="number" name="rr" placeholder="e.g., 16" min="6" max="60">
+          <div class="none-option">
+            <input type="checkbox" id="rr-none" name="rr-none">
+            <label for="rr-none">None</label>
+          </div>
+        </div>
+        
+        <!-- SpO2 -->
+        <div class="form-row">
+          <label>SpO2 (%)</label>
+          <input type="number" name="spo2" placeholder="e.g., 98" min="70" max="100">
+          <div class="none-option">
+            <input type="checkbox" id="spo2-none" name="spo2-none">
+            <label for="spo2-none">None</label>
+          </div>
+        </div>
+        
+        <!-- Temperature -->
+        <div class="form-row">
+          <label>Temperature (°C)</label>
+          <input type="number" name="temp" placeholder="e.g., 36.8" min="34" max="42" step="0.1">
+          <div class="none-option">
+            <input type="checkbox" id="temp-none" name="temp-none">
+            <label for="temp-none">None</label>
+          </div>
+        </div>
+        
+        <!-- Triage Score -->
+        <div class="form-row">
+          <label>Triage Score</label>
+          <input type="number" name="triageScore" placeholder="e.g., 8" min="0" max="20">
+          <div class="none-option">
+            <input type="checkbox" id="score-none" name="score-none">
+            <label for="score-none">None</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Information -->
+      <div class="form-section">
+        <h3>Status Information</h3>
+        
+        <!-- Initial Status -->
+        <div class="form-row">
+          <select name="status" required>
+            <option value="">Select Status</option>
+            <option value="WAITING">Waiting</option>
+            <option value="IN_TREATMENT">In Treatment</option>
+            <option value="TREATED">Treated</option>
+          </select>
+          <div class="none-option">
+            <input type="checkbox" id="status-none" name="status-none">
+            <label for="status-none">None</label>
+          </div>
+        </div>
+        
+        <!-- Wait Time -->
+        <div class="form-row">
+          <input type="text" name="waitTime" placeholder="Wait Time (e.g., 15 min)">
+          <div class="none-option">
+            <input type="checkbox" id="waittime-none" name="waittime-none">
+            <label for="waittime-none">None</label>
+          </div>
+        </div>
+        
+        <!-- Treatment Start Time -->
+        <div class="form-row">
+          <input type="datetime-local" name="treatmentStart">
+          <div class="none-option">
+            <input type="checkbox" id="treatment-none" name="treatment-none">
+            <label for="treatment-none">None</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-buttons">
+        <button type="submit" id="newRegisterBtn">Register Patient</button>
+        <button type="button" id="cancelRegister">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="main-footer">
+    <div class="footer-content">
+      <img src="/webapp/images/xCGUQrew_400x400.jpg" alt="Hospital Logo" class="logo">
+      <p>© 2025 Hospital System | All Rights Reserved</p>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>

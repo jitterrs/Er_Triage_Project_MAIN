@@ -15,5 +15,11 @@
             "password": "Yaznbash2002@",
             "name": "er_system"
         }
+
+    ],
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "c:\\Users\\rakan\\Desktop\\mysql-connector-j-9.5.0\\mysql-connector-j-9.5.0.jar"
+
     ]
 }
