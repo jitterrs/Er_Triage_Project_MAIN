@@ -51,7 +51,14 @@ public class PatientController {
 
     // 7.1.6 changeStatus()
     public PatientView changeStatus(long id, ChangeStatusRequest req) {
-        // if you want, you can call validateStatusChange here once you know old status
+        // Get current status first
+        PatientView current = patientService.getPatient(id);
+
+        // Validate transition (e.g. TREATED -> WAITING is not allowed)
+        validationService.validateStatusChange(current.status, req.newStatus);
+
+        // Then perform status change + audit
         return patientService.changeStatus(id, req);
     }
+
 }
