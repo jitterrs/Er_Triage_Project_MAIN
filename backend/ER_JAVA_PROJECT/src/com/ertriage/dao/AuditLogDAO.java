@@ -1,25 +1,25 @@
 package com.ertriage.dao;
 
-import com.ertriage.model.AuditLog;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ertriage.model.AuditLog;
+
 public class AuditLogDAO {
 
     private Connection getConnection() throws SQLException {
         String url  = "jdbc:mysql://localhost:3306/er_triage_db";
         String user = "root";      // same as MainDemo
-        String pass = "Yaznbash2002@";  // same as MainDemo
+        String pass = "Alya1020";  // same as MainDemo
         return DriverManager.getConnection(url, user, pass);
     }
 

@@ -1,6 +1,5 @@
 -- ==========================================================
 --   ER TRIAGE SYSTEM DATABASE SCHEMA
---   Matches Java DAOs + SDS component design
 -- ==========================================================
 
 -- Create DB
@@ -11,6 +10,16 @@ USE er_triage_db;
 DROP TABLE IF EXISTS vitals_history;
 DROP TABLE IF EXISTS audit_log;
 DROP TABLE IF EXISTS patients;
+DROP TABLE IF EXISTS nurses;
+
+-- ==========================================================
+--   NURSES TABLE (Simplified: just username and password)
+-- ==========================================================
+
+CREATE TABLE nurses (
+    username VARCHAR(50) PRIMARY KEY,
+    password VARCHAR(100) NOT NULL
+);
 
 -- ==========================================================
 --   PATIENTS TABLE
@@ -52,7 +61,8 @@ CREATE TABLE patients (
            NOT NULL DEFAULT 'WAITING',
 
     -- When patient entered the system
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- ==========================================================
@@ -96,9 +106,16 @@ CREATE TABLE vitals_history (
 );
 
 -- ==========================================================
--- SAMPLE DATA (optional)
+-- SAMPLE DATA
 -- ==========================================================
 
+-- Add sample nurses (just username and password)
+INSERT INTO nurses (username, password) VALUES
+('admin', '1234'),
+('nurse1', 'password123'),
+('nurse2', 'nurse456');
+
+-- Add sample patients
 INSERT INTO patients
 (name, national_id, age, gender, phone,
  symptom,
