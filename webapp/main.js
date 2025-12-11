@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return 'PAT' + Date.now().toString().slice(-6);
   }
 
-  // --- NONE CHECKBOX FUNCTIONALITY ---
+  // NONE CHECKBOX FUNCTIONALITY
   function initializeNoneCheckboxes() {
     const noneCheckboxes = document.querySelectorAll('.none-option input[type="checkbox"]');
     
@@ -131,7 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   initializeNoneCheckboxes();
 
-  // --- INPUT VALIDATION ---
+  // INPUT VALIDATION
   function initializeInputValidation() {
     const ageInput = document.querySelector('input[name="age"]');
     const hrInput = document.querySelector('input[name="hr"]');
@@ -185,199 +185,57 @@ document.addEventListener("DOMContentLoaded", () => {
 
   initializeInputValidation();
 
-  // --- VIEW PATIENT BUTTON LOGIC ---
+  // VIEW PATIENT BUTTON LOGIC
   if (viewBtn) {
     viewBtn.addEventListener('click', () => {
       window.location.href = "patientDashboard.html";
     });
   }
 
-// --- LOGIN FUNCTIONALITY ---
-const loginForm = document.getElementById("loginForm");
-if (loginForm) {
-  loginForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    // Intentionally left blank: real login will be wired to backend later.
-  });
-}
+  // --- FIXED LOGIN FUNCTIONALITY ---
+  const loginForm = document.getElementById("loginForm");
+
+  if (loginForm) {
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const message = document.getElementById("loginMessage");
+
+      try {
+        const res = await fetch("/api/login", {   // FIXED URL HERE
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (!data.success) {
+          message.textContent = "Invalid credentials";
+          message.style.color = "red";
+          return;
+        }
+
+        message.textContent = "Login successful!";
+        message.style.color = "lightgreen";
+
+        setTimeout(() => {
+          window.location.href = "dashboard.html";
+        }, 700);
+
+      } catch (err) {
+        console.error(err);
+        message.textContent = "Server error";
+        message.style.color = "red";
+      }
+    });
+  }
 
 
-  // ========================
   // PATIENT DASHBOARD LOGIC
-  // ========================
-
   if (document.getElementById('btnPatientInfo')) {
-    console.log("Patient dashboard detected - initializing...");
     initializePatientDashboard();
   }
 });
-
-// ACCESSIBILITY FUNCTIONALITY
-function initializeAccessibility() {
-  console.log("Initializing accessibility features...");
-
-  const toggleBtn = document.getElementById('accessibilityToggle');
-  const panel = document.getElementById('accessibilityPanel');
-  const brightnessSlider = document.getElementById('brightnessSlider');
-  const brightnessValue = document.getElementById('brightnessValue');
-
-  if (!toggleBtn || !panel) return;
-
-  toggleBtn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    panel.classList.toggle('accessibility-hidden');
-  });
-
-  if (brightnessSlider && brightnessValue) {
-    brightnessSlider.addEventListener('input', function() {
-      document.documentElement.style.filter = `brightness(${this.value}%)`;
-      brightnessValue.textContent = this.value + '%';
-    });
-  }
-
-  const highContrastCheckbox = document.getElementById('highContrast');
-  if (highContrastCheckbox) {
-    highContrastCheckbox.addEventListener('change', function(e) {
-      document.body.classList.toggle('high-contrast', e.target.checked);
-    });
-  }
-
-  const largeTextCheckbox = document.getElementById('largeText');
-  if (largeTextCheckbox) {
-    largeTextCheckbox.addEventListener('change', function(e) {
-      document.body.classList.toggle('large-text', e.target.checked);
-    });
-  }
-
-  const reduceMotionCheckbox = document.getElementById('reduceMotion');
-  if (reduceMotionCheckbox) {
-    reduceMotionCheckbox.addEventListener('change', function(e) {
-      document.body.classList.toggle('reduced-motion', e.target.checked);
-    });
-  }
-
-  const reduceBrightnessCheckbox = document.getElementById('reduceBrightness');
-  if (reduceBrightnessCheckbox && brightnessSlider) {
-    reduceBrightnessCheckbox.addEventListener('change', function(e) {
-      brightnessSlider.value = e.target.checked ? 70 : 100;
-      document.documentElement.style.filter = `brightness(${brightnessSlider.value}%)`;
-      if (brightnessValue) brightnessValue.textContent = brightnessSlider.value + '%';
-    });
-  }
-
-  document.addEventListener('click', function(e) {
-    if (panel && !panel.contains(e.target) && !toggleBtn.contains(e.target)) {
-      panel.classList.add('accessibility-hidden');
-    }
-  });
-}
-
-function resetAccessibility() {
-  document.documentElement.style.filter = 'brightness(100%)';
-  document.body.classList.remove('high-contrast', 'large-text', 'reduced-motion');
-
-  const ids = ['reduceBrightness', 'highContrast', 'largeText', 'reduceMotion'];
-  ids.forEach(id => {
-    const box = document.getElementById(id);
-    if (box) box.checked = false;
-  });
-
-  const brightnessSlider = document.getElementById('brightnessSlider');
-  const brightnessValue = document.getElementById('brightnessValue');
-
-  if (brightnessSlider) brightnessSlider.value = 100;
-  if (brightnessValue) brightnessValue.textContent = '100%';
-
-  const panel = document.getElementById('accessibilityPanel');
-  if (panel) panel.classList.add('accessibility-hidden');
-}
-
-// PATIENT DASHBOARD FUNCTION
-function initializePatientDashboard() {
-  console.log("Initializing patient dashboard...");
-
-  const btnPatientInfo = document.getElementById('btnPatientInfo');
-  const btnQueue = document.getElementById('btnQueue');
-  const btnInTreatment = document.getElementById('btnInTreatment');
-
-  const patientInfoSection = document.getElementById('patientInfoSection');
-  const queueSection = document.getElementById('queueSection');
-  const inTreatmentSection = document.getElementById('inTreatmentSection');
-
-  const patientModal = document.getElementById('patientModal');
-  const closeModalBtn = document.getElementById('closeModalBtn');
-
-  const modalTabBtns = document.querySelectorAll('.tab-btn');
-  const modalTabPanes = document.querySelectorAll('.tab-pane');
-
-  const patientTableBody = document.querySelector("#patientTable tbody");
-  const queueTableBody = document.querySelector("#queueTable tbody");
-  const inTreatmentTableBody = document.querySelector("#inTreatmentTable tbody");
-
-  // ❌ REMOVED SAMPLE PATIENT DATA
-  const samplePatients = [];
-
-  function showSection(section) {
-    if (patientInfoSection) patientInfoSection.classList.add('hidden');
-    if (queueSection) queueSection.classList.add('hidden');
-    if (inTreatmentSection) inTreatmentSection.classList.add('hidden');
-
-    if (btnPatientInfo) btnPatientInfo.classList.remove('active');
-    if (btnQueue) btnQueue.classList.remove('active');
-    if (btnInTreatment) btnInTreatment.classList.remove('active');
-
-    if (section === 'patientInfo') {
-      patientInfoSection.classList.remove('hidden');
-      btnPatientInfo.classList.add('active');
-    }
-    if (section === 'queue') {
-      queueSection.classList.remove('hidden');
-      btnQueue.classList.add('active');
-    }
-    if (section === 'inTreatment') {
-      inTreatmentSection.classList.remove('hidden');
-      btnInTreatment.classList.add('active');
-    }
-  }
-
-  if (btnPatientInfo) btnPatientInfo.addEventListener('click', () => showSection('patientInfo'));
-  if (btnQueue) btnQueue.addEventListener('click', () => showSection('queue'));
-  if (btnInTreatment) btnInTreatment.addEventListener('click', () => showSection('inTreatment'));
-
-  function loadPatients(patients) {
-    if (patientTableBody) patientTableBody.innerHTML = '';
-    if (queueTableBody) queueTableBody.innerHTML = '';
-    if (inTreatmentTableBody) inTreatmentTableBody.innerHTML = '';
-  }
-
-  function showPatientModal() {
-    if (patientModal) patientModal.classList.remove('hidden');
-  }
-
-  modalTabBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      modalTabBtns.forEach(b => b.classList.remove('active'));
-      modalTabPanes.forEach(p => p.classList.remove('active'));
-
-      btn.classList.add('active');
-      const tabPane = document.getElementById(btn.getAttribute('data-tab'));
-      if (tabPane) tabPane.classList.add('active');
-    });
-  });
-
-  if (closeModalBtn) {
-    closeModalBtn.addEventListener('click', () => {
-      if (patientModal) patientModal.classList.add('hidden');
-    });
-  }
-
-  if (patientModal) {
-    patientModal.addEventListener('click', e => {
-      if (e.target === patientModal) patientModal.classList.add('hidden');
-    });
-  }
-
-  loadPatients(samplePatients);
-  showSection('patientInfo');
-  console.log("Patient dashboard initialized");
-}
