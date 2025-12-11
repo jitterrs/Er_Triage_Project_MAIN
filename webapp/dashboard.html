@@ -43,12 +43,10 @@
           </div>
         </div>
         
-        <!-- Patient ID -->
+        <!-- National ID (REPLACED patientId) -->
         <div class="form-row">
-          <input type="text" name="patientId" placeholder="Patient ID" required>
-          <div class="none-option">
-
-          </div>
+          <input type="text" name="nationalId" placeholder="National ID" required>
+          <div class="none-option"></div>
         </div>
         
         <!-- Age -->
@@ -67,8 +65,7 @@
             <option value="M">Male</option>
             <option value="F">Female</option>
           </select>
-          <div class="none-option">
-          </div>
+          <div class="none-option"></div>
         </div>
       </div>
 
@@ -102,25 +99,20 @@
             <label for="history-none">None</label>
           </div>
         </div>
-        
-        <!-- Triage Level -->
+
+        <!-- Triage Level (unchanged, but empty in your file) -->
         <div class="form-row">
-        
-          <div class="none-option">
-          </div>
+          <div class="none-option"></div>
         </div>
         
-        <!-- Red Flag -->
+        <!-- Red Flag (REMOVED the None checkbox) -->
         <div class="form-row">
           <select name="redFlag">
             <option value="">Red Flag Present?</option>
             <option value="Yes">Yes</option>
             <option value="No">No</option>
           </select>
-          <div class="none-option">
-            <input type="checkbox" id="redflag-none" name="redflag-none">
-            <label for="redflag-none">None</label>
-          </div>
+          <!-- Removed None checkbox here -->
         </div>
         
         <!-- Triage Reason -->
@@ -187,15 +179,7 @@
           </div>
         </div>
         
-        <!-- Triage Score -->
-        <div class="form-row">
-          <label>Triage Score</label>
-          <input type="number" name="triageScore" placeholder="e.g., 8" min="0" max="20">
-          <div class="none-option">
-            <input type="checkbox" id="score-none" name="score-none">
-            <label for="score-none">None</label>
-          </div>
-        </div>
+        <!-- REMOVED: Triage Score Entirely -->
       </div>
 
       <!-- Status Information -->

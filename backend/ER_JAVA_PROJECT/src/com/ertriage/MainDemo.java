@@ -1,26 +1,30 @@
 package com.ertriage;
 
-import com.ertriage.dao.AuditLogDAO;
-import com.ertriage.dao.PatientDAO;
-import com.ertriage.dto.ChangeStatusRequest;
-import com.ertriage.dto.CreatePatientRequest;
-import com.ertriage.dto.PatientView;
-import com.ertriage.dto.UpdateVitalsRequest;
-import com.ertriage.model.Status;
-import com.ertriage.model.AuditLog;
-import com.ertriage.service.*;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import com.ertriage.dao.AuditLogDAO;
+import com.ertriage.dao.PatientDAO;
+import com.ertriage.dto.ChangeStatusRequest;
+import com.ertriage.dto.CreatePatientRequest;
+import com.ertriage.dto.PatientView;
+import com.ertriage.dto.UpdateVitalsRequest;
+import com.ertriage.model.AuditLog;
+import com.ertriage.model.Status;
+import com.ertriage.service.AuditService;
+import com.ertriage.service.PatientService;
+import com.ertriage.service.QueueService;
+import com.ertriage.service.TriageService;
+import com.ertriage.service.ValidationService;
+
 public class MainDemo {
 
     private static final String URL  = "jdbc:mysql://localhost:3306/er_triage_db";
     private static final String USER = "root";        // CHANGE IF NEEDED
-    private static final String PASS = "Yaznbash2002@"; // CHANGE IF NEEDED
+    private static final String PASS = "Alya1020"; // CHANGE IF NEEDED
 
     public static void main(String[] args) {
 

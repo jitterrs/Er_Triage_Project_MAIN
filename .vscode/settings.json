@@ -10,12 +10,12 @@
             "server": "localhost",
             "port": 3306,
             "driver": "MySQL",
-            "database": "mysql",
+            "name": "er_triage_db",
+            "database": "er_triage_db",
             "username": "root",
-            "password": "Yaznbash2002@",
-            "name": "er_system"
+            "password": "Alya1020",
+            "connectionTimeout": 30
         }
-
     ],
     "java.project.referencedLibraries": [
         "lib/**/*.jar",

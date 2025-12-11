@@ -1,19 +1,25 @@
 package com.ertriage.dao;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.ertriage.model.Patient;
 import com.ertriage.model.Status;
 import com.ertriage.model.Vitals;
-
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class PatientDAO {
 
     private Connection getConnection() throws SQLException {
         String url = "jdbc:mysql://localhost:3306/er_triage_db";
         String user = "root";      // TODO: change to your DB username
-        String pass = "Yaznbash2002@";  // TODO: change to your DB password
+        String pass = "Alya1020";  // TODO: change to your DB password
         return DriverManager.getConnection(url, user, pass);
     }
 
