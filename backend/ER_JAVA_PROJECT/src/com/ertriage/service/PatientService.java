@@ -44,7 +44,15 @@ public class PatientService {
         patient.redFlag = result.redFlag;
         patient.triageReason = result.reason;
 
-        patientDAO.save(patient);
+        // Auto-update status for critical patients:
+        // If patient was waiting and triage marks them as red-flag or level 1,
+        // move them directly into IN_TREATMENT so they are not kept in the waiting queue.
+        if (patient.status == Status.WAITING && (result.redFlag || result.level == 1)) {
+            patient.status = Status.IN_TREATMENT;
+        }
+
+        // use returned Patient from DAO (sets id)
+        patient = patientDAO.save(patient);
         auditService.record(patient.id, "SYSTEM", "CREATE_PATIENT", "Initial registration");
 
         return toView(patient);
@@ -73,7 +81,13 @@ public class PatientService {
         patient.redFlag = result.redFlag;
         patient.triageReason = result.reason;
 
-        patientDAO.update(patient);
+        // Auto-update status for critical patients:
+        if (patient.status == Status.WAITING && (result.redFlag || result.level == 1)) {
+            patient.status = Status.IN_TREATMENT;
+        }
+
+        // use returned Patient from DAO
+        patient = patientDAO.update(patient);
         auditService.record(patientId, "SYSTEM", "UPDATE_VITALS", "Vitals updated");
 
         return toView(patient);
@@ -94,7 +108,13 @@ public class PatientService {
         patient.redFlag = result.redFlag;
         patient.triageReason = result.reason;
 
-        patientDAO.update(patient);
+        // Auto-update status for critical patients:
+        if (patient.status == Status.WAITING && (result.redFlag || result.level == 1)) {
+            patient.status = Status.IN_TREATMENT;
+        }
+
+        // use returned Patient from DAO
+        patient = patientDAO.update(patient);
         auditService.record(patientId, "SYSTEM", "UPDATE_SYMPTOMS", "Symptoms updated");
 
         return toView(patient);
@@ -107,13 +127,12 @@ public class PatientService {
             throw new IllegalArgumentException("Patient not found: " + patientId);
         }
 
-        Status oldStatus = patient.status;
-        Status newStatus = Objects.requireNonNull(req.newStatus, "New status is required");
+        Status newStatus = Objects.requireNonNull(req.newStatus, "newStatus cannot be null");
         patient.status = newStatus;
 
-        patientDAO.update(patient);
-        auditService.record(patientId, "SYSTEM", "CHANGE_STATUS",
-                "From " + oldStatus + " to " + newStatus);
+        // use returned Patient from DAO
+        patient = patientDAO.update(patient);
+        auditService.record(patientId, "SYSTEM", "CHANGE_STATUS", "Status changed to " + newStatus);
 
         return toView(patient);
     }
@@ -127,6 +146,7 @@ public class PatientService {
         return toView(patient);
     }
 
+    // Helper: convert domain model to DTO
     private PatientView toView(Patient p) {
         PatientView v = new PatientView();
         v.id = p.id;

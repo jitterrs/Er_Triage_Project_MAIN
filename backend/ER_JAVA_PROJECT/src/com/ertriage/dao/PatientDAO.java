@@ -18,125 +18,143 @@ public class PatientDAO {
     }
 
     // 7.8.1 save()
-    public void save(Patient p) {
-        String sql = """
-            INSERT INTO patients
-            (name, national_id, age, gender, phone,
-             current_medications, past_medical_history,
+public Patient save(Patient p) {
+    String sql = """
+        INSERT INTO patients
+            (name, age, gender, symptoms,
              bp_sys, bp_dia, hr, rr, spo2, temp,
-             symptom, triage_level, triage_score, red_flag, triage_reason, status)
-            VALUES
-            (?, NULL, ?, ?, NULL,
-             NULL, NULL,
-             ?, ?, ?, ?, ?, ?,
-             ?, ?, ?, ?, ?, ?)
-            """;
+             triage_level, triage_score, red_flag, triage_reason,
+             status, created_at)
+        VALUES (?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?,
+                ?, NOW())
+        """;
 
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+    try (Connection conn = getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            ps.setString(1, p.name);
-            ps.setInt(2, p.age);
-            ps.setString(3, p.gender);
+        // Basic info
+        ps.setString(1, p.name);
+        ps.setInt(2, p.age);
+        ps.setString(3, p.gender);
+        ps.setString(4, p.symptoms);
 
-            // vitals (may be null)
-            if (p.vitals != null) {
-                ps.setObject(4, p.vitals.bpSys, Types.INTEGER);
-                ps.setObject(5, p.vitals.bpDia, Types.INTEGER);
-                ps.setObject(6, p.vitals.hr, Types.INTEGER);
-                ps.setObject(7, p.vitals.rr, Types.INTEGER);
-                ps.setObject(8, p.vitals.spo2, Types.INTEGER);
-                if (p.vitals.temp != null) {
-                    ps.setDouble(9, p.vitals.temp);
-                } else {
-                    ps.setNull(9, Types.DECIMAL);
-                }
-            } else {
-                ps.setNull(4, Types.INTEGER);
-                ps.setNull(5, Types.INTEGER);
-                ps.setNull(6, Types.INTEGER);
-                ps.setNull(7, Types.INTEGER);
-                ps.setNull(8, Types.INTEGER);
-                ps.setNull(9, Types.DECIMAL);
-            }
-
-            ps.setString(10, p.symptoms);                 // symptom
-            ps.setInt(11, p.triageLevel);
-            ps.setInt(12, p.triageScore);
-            ps.setBoolean(13, p.redFlag);
-            ps.setString(14, p.triageReason);
-            ps.setString(15, p.status != null ? p.status.name() : Status.WAITING.name());
-
-            ps.executeUpdate();
-
-            // get generated id
-            try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (rs.next()) {
-                    p.id = rs.getLong(1);
-                }
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error saving patient", e);
+        // Vitals (nullable)
+        if (p.vitals != null) {
+            ps.setObject(5, p.vitals.bpSys, Types.INTEGER);
+            ps.setObject(6, p.vitals.bpDia, Types.INTEGER);
+            ps.setObject(7, p.vitals.hr, Types.INTEGER);
+            ps.setObject(8, p.vitals.rr, Types.INTEGER);
+            ps.setObject(9, p.vitals.spo2, Types.INTEGER);
+            ps.setObject(10, p.vitals.temp, Types.DOUBLE);
+        } else {
+            ps.setNull(5, Types.INTEGER);
+            ps.setNull(6, Types.INTEGER);
+            ps.setNull(7, Types.INTEGER);
+            ps.setNull(8, Types.INTEGER);
+            ps.setNull(9, Types.INTEGER);
+            ps.setNull(10, Types.DOUBLE);
         }
+
+        // Triage fields
+        ps.setInt(11, p.triageLevel);
+        ps.setInt(12, p.triageScore);
+        ps.setBoolean(13, p.redFlag);
+        ps.setString(14, p.triageReason);
+
+        // Status (default to WAITING if null)
+        String statusStr = (p.status != null) ? p.status.name() : Status.WAITING.name();
+        ps.setString(15, statusStr);
+
+        // Execute insert
+        ps.executeUpdate();
+
+        // Read generated ID
+        try (ResultSet rs = ps.getGeneratedKeys()) {
+            if (rs.next()) {
+                p.id = rs.getLong(1);
+            }
+        }
+
+    } catch (SQLException e) {
+        throw new RuntimeException("Error saving patient", e);
     }
 
-    // 7.8.2 update()
-    public void update(Patient p) {
-        String sql = """
-            UPDATE patients
-            SET name = ?,
-                age = ?,
-                gender = ?,
-                bp_sys = ?, bp_dia = ?, hr = ?, rr = ?, spo2 = ?, temp = ?,
-                symptom = ?,
-                triage_level = ?, triage_score = ?, red_flag = ?, triage_reason = ?,
-                status = ?
-            WHERE id = ?
-            """;
+    return p;
+}
 
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+// 7.8.2 update()
+public Patient update(Patient p) {
+    String sql = """
+        UPDATE patients
+        SET name = ?,
+            age = ?,
+            gender = ?,
+            symptoms = ?,
+            bp_sys = ?,
+            bp_dia = ?,
+            hr = ?,
+            rr = ?,
+            spo2 = ?,
+            temp = ?,
+            triage_level = ?,
+            triage_score = ?,
+            red_flag = ?,
+            triage_reason = ?,
+            status = ?
+        WHERE id = ?
+        """;
 
-            ps.setString(1, p.name);
-            ps.setInt(2, p.age);
-            ps.setString(3, p.gender);
+    try (Connection conn = getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            if (p.vitals != null) {
-                ps.setObject(4, p.vitals.bpSys, Types.INTEGER);
-                ps.setObject(5, p.vitals.bpDia, Types.INTEGER);
-                ps.setObject(6, p.vitals.hr, Types.INTEGER);
-                ps.setObject(7, p.vitals.rr, Types.INTEGER);
-                ps.setObject(8, p.vitals.spo2, Types.INTEGER);
-                if (p.vitals.temp != null) {
-                    ps.setDouble(9, p.vitals.temp);
-                } else {
-                    ps.setNull(9, Types.DECIMAL);
-                }
-            } else {
-                ps.setNull(4, Types.INTEGER);
-                ps.setNull(5, Types.INTEGER);
-                ps.setNull(6, Types.INTEGER);
-                ps.setNull(7, Types.INTEGER);
-                ps.setNull(8, Types.INTEGER);
-                ps.setNull(9, Types.DECIMAL);
-            }
+        // Basic info
+        ps.setString(1, p.name);
+        ps.setInt(2, p.age);
+        ps.setString(3, p.gender);
+        ps.setString(4, p.symptoms);
 
-            ps.setString(10, p.symptoms);
-            ps.setInt(11, p.triageLevel);
-            ps.setInt(12, p.triageScore);
-            ps.setBoolean(13, p.redFlag);
-            ps.setString(14, p.triageReason);
-            ps.setString(15, p.status != null ? p.status.name() : Status.WAITING.name());
-
-            ps.setLong(16, p.id);
-
-            ps.executeUpdate();
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error updating patient id=" + p.id, e);
+        // Vitals (nullable)
+        if (p.vitals != null) {
+            ps.setObject(5, p.vitals.bpSys, Types.INTEGER);
+            ps.setObject(6, p.vitals.bpDia, Types.INTEGER);
+            ps.setObject(7, p.vitals.hr, Types.INTEGER);
+            ps.setObject(8, p.vitals.rr, Types.INTEGER);
+            ps.setObject(9, p.vitals.spo2, Types.INTEGER);
+            ps.setObject(10, p.vitals.temp, Types.DOUBLE);
+        } else {
+            ps.setNull(5, Types.INTEGER);
+            ps.setNull(6, Types.INTEGER);
+            ps.setNull(7, Types.INTEGER);
+            ps.setNull(8, Types.INTEGER);
+            ps.setNull(9, Types.INTEGER);
+            ps.setNull(10, Types.DOUBLE);
         }
+
+        // Triage fields
+        ps.setInt(11, p.triageLevel);
+        ps.setInt(12, p.triageScore);
+        ps.setBoolean(13, p.redFlag);
+        ps.setString(14, p.triageReason);
+
+        // Status
+        String statusStr = (p.status != null) ? p.status.name() : Status.WAITING.name();
+        ps.setString(15, statusStr);
+
+        // WHERE id = ?
+        ps.setLong(16, p.id);
+
+        ps.executeUpdate();
+
+    } catch (SQLException e) {
+        throw new RuntimeException("Error updating patient id=" + p.id, e);
     }
+
+    return p;
+}
+
+
 
     // 7.8.3 findById()
     public Patient findById(long id) {
@@ -171,18 +189,18 @@ public class PatientDAO {
         if (hasFilter) {
             sb.append(" AND name LIKE ?");
         }
-        sb.append(" ORDER BY triage_level, triage_score DESC, created_at");
+        sb.append(" ORDER BY triage_level, triage_score DESC, created_at, age DESC");
         sb.append(" LIMIT ? OFFSET ?");
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sb.toString())) {
 
-            int idx = 1;
+            int index = 1;
             if (hasFilter) {
-                ps.setString(idx++, "%" + nameFilter + "%");
+                ps.setString(index++, "%" + nameFilter + "%");
             }
-            ps.setInt(idx++, limit);
-            ps.setInt(idx, offset);
+            ps.setInt(index++, limit);
+            ps.setInt(index, offset);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -197,14 +215,14 @@ public class PatientDAO {
         return result;
     }
 
-    // Helper to map a DB row -> Patient object
+    // 7.8.5 mapRowToPatient()
     private Patient mapRowToPatient(ResultSet rs) throws SQLException {
         Patient p = new Patient();
         p.id = rs.getLong("id");
         p.name = rs.getString("name");
         p.age = rs.getInt("age");
         p.gender = rs.getString("gender");
-        p.symptoms = rs.getString("symptom");
+        p.symptoms = rs.getString("symptoms");
 
         Vitals v = new Vitals();
         v.bpSys = (Integer) rs.getObject("bp_sys");
@@ -212,8 +230,7 @@ public class PatientDAO {
         v.hr = (Integer) rs.getObject("hr");
         v.rr = (Integer) rs.getObject("rr");
         v.spo2 = (Integer) rs.getObject("spo2");
-        Double temp = rs.getObject("temp") != null ? rs.getDouble("temp") : null;
-        v.temp = temp;
+        v.temp = (Double) rs.getObject("temp");
         p.vitals = v;
 
         p.triageLevel = rs.getInt("triage_level");

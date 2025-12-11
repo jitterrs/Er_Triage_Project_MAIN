@@ -7,6 +7,11 @@ import com.ertriage.model.Status;
 
 public class ValidationService {
 
+        // UML: validateIntake(CreatePatientRequest)
+    // Delegate to validateCreate() so UML and implementation are aligned.
+
+
+
     // 7.6.1 validateCreate()
     public void validateCreate(CreatePatientRequest req) {
         if (req == null) {
@@ -19,6 +24,12 @@ public class ValidationService {
             throw new IllegalArgumentException("Age must be positive");
         }
     }
+    // UML: validateIntake(CreatePatientRequest)
+    // Implementation delegates to validateCreate()
+    public void validateIntake(CreatePatientRequest req) {
+        validateCreate(req);
+    }
+
 
     // 7.6.2 validateUpdateVitals()
     public void validateUpdateVitals(UpdateVitalsRequest req) {

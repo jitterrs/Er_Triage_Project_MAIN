@@ -1,7 +1,8 @@
 package com.ertriage.service;
 
 import com.ertriage.Config.TriageConfig;
-
+import java.util.Set;
+import java.util.LinkedHashSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -60,4 +61,33 @@ public class KeywordService {
 
         return new SymptomAnalysis(score, redFlag, hits);
     }
+
+    // UML: extract(String symptomText): Set<String>
+// Uses the existing analyze() logic and returns only the keyword strings.
+public Set<String> extract(String symptomText) {
+    // Avoid null pointer
+    String text = (symptomText == null) ? "" : symptomText;
+
+    // Reuse existing logic
+    SymptomAnalysis analysis = analyze(text);
+
+    // Use LinkedHashSet to avoid duplicates and keep insertion order
+    Set<String> keywords = new LinkedHashSet<>();
+
+    // NOTE: the field name is matchedKeywords, not hits
+    for (String hit : analysis.matchedKeywords) {
+        // hits might look like "chest pain (+2)" or "shortness of breath (red flag)"
+        // Strip anything after " (" to get a cleaner keyword
+        String base = hit;
+        int idx = base.indexOf(" (");
+        if (idx >= 0) {
+            base = base.substring(0, idx);
+        }
+        keywords.add(base);
+    }
+
+    return keywords;
+}
+
+
 }
