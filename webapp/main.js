@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const patientData = {
         id: formData.get('patientId') || generatePatientId(),
         name: formData.get('patientName'),
-        nationalId: formData.get('nationalId'), // Updated from patientId
+        nationalId: formData.get('nationalId'),
         age: formData.get('age'),
         gender: formData.get('gender'),
         symptoms: formData.get('symptoms'),
@@ -95,7 +95,6 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       inputField.disabled = false;
       resetFieldPlaceholder(inputField);
-      // Only set required if field originally had required attribute
       if (inputField.hasAttribute('data-originally-required')) {
         inputField.setAttribute('required', 'true');
       }
@@ -105,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function resetFieldPlaceholder(inputField) {
     const placeholders = {
       'patientName': 'Patient Name',
-      'nationalId': 'National ID', // Updated from patientId
+      'nationalId': 'National ID',
       'age': 'Age',
       'symptoms': 'Symptoms',
       'currentMeds': 'Current Medications',
@@ -130,7 +129,6 @@ document.addEventListener("DOMContentLoaded", () => {
     allInputs.forEach(input => {
       input.disabled = false;
       resetFieldPlaceholder(input);
-      // Only add required if field was originally required
       if (input.hasAttribute('data-originally-required')) {
         input.setAttribute('required', 'true');
       }
@@ -226,7 +224,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // PATIENT DASHBOARD LOGIC
   // ========================
   
-  // Check if we're on the patient dashboard page FIRST
   if (document.getElementById('btnPatientInfo')) {
     console.log("Patient dashboard detected - initializing...");
     initializePatientDashboard();
@@ -247,26 +244,21 @@ function initializeAccessibility() {
     return;
   }
 
-  // Toggle panel visibility
   toggleBtn.addEventListener('click', function(e) {
     e.stopPropagation();
     panel.classList.toggle('accessibility-hidden');
     console.log("Accessibility panel toggled");
   });
 
-  // Brightness control - Apply to entire page
   if (brightnessSlider && brightnessValue) {
     brightnessSlider.addEventListener('input', function() {
       const brightness = this.value;
       brightnessValue.textContent = brightness + '%';
-      
-      // Apply brightness to the entire page
       document.documentElement.style.filter = `brightness(${brightness}%)`;
       console.log("Brightness set to:", brightness + '%');
     });
   }
 
-  // High contrast mode
   const highContrastCheckbox = document.getElementById('highContrast');
   if (highContrastCheckbox) {
     highContrastCheckbox.addEventListener('change', function(e) {
@@ -280,7 +272,6 @@ function initializeAccessibility() {
     });
   }
 
-  // Large text mode
   const largeTextCheckbox = document.getElementById('largeText');
   if (largeTextCheckbox) {
     largeTextCheckbox.addEventListener('change', function(e) {
@@ -294,7 +285,6 @@ function initializeAccessibility() {
     });
   }
 
-  // Reduce motion
   const reduceMotionCheckbox = document.getElementById('reduceMotion');
   if (reduceMotionCheckbox) {
     reduceMotionCheckbox.addEventListener('change', function(e) {
@@ -308,7 +298,6 @@ function initializeAccessibility() {
     });
   }
 
-  // Reduce brightness checkbox
   const reduceBrightnessCheckbox = document.getElementById('reduceBrightness');
   if (reduceBrightnessCheckbox && brightnessSlider) {
     reduceBrightnessCheckbox.addEventListener('change', function(e) {
@@ -326,7 +315,6 @@ function initializeAccessibility() {
     });
   }
 
-  // Close panel when clicking outside
   document.addEventListener('click', function(e) {
     if (panel && !panel.contains(e.target) && !toggleBtn.contains(e.target) && !panel.classList.contains('accessibility-hidden')) {
       panel.classList.add('accessibility-hidden');
@@ -334,7 +322,6 @@ function initializeAccessibility() {
     }
   });
 
-  // Close panel with Escape key
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape' && panel && !panel.classList.contains('accessibility-hidden')) {
       panel.classList.add('accessibility-hidden');
@@ -345,15 +332,12 @@ function initializeAccessibility() {
   console.log("Accessibility features initialized");
 }
 
-// Reset all accessibility settings
 function resetAccessibility() {
   console.log("Resetting all accessibility settings");
   
-  // Reset brightness on entire page
   document.documentElement.style.filter = 'brightness(100%)';
   document.body.classList.remove('high-contrast', 'large-text', 'reduced-motion');
   
-  // Reset checkboxes
   const reduceBrightnessCheckbox = document.getElementById('reduceBrightness');
   const highContrastCheckbox = document.getElementById('highContrast');
   const largeTextCheckbox = document.getElementById('largeText');
@@ -364,63 +348,53 @@ function resetAccessibility() {
   if (largeTextCheckbox) largeTextCheckbox.checked = false;
   if (reduceMotionCheckbox) reduceMotionCheckbox.checked = false;
   
-  // Reset slider
   const brightnessSlider = document.getElementById('brightnessSlider');
   const brightnessValue = document.getElementById('brightnessValue');
   
   if (brightnessSlider) brightnessSlider.value = 100;
   if (brightnessValue) brightnessValue.textContent = '100%';
   
-  // Close panel
   const panel = document.getElementById('accessibilityPanel');
   if (panel) panel.classList.add('accessibility-hidden');
 }
 
-// PATIENT DASHBOARD FUNCTION (defined outside DOMContentLoaded)
+// PATIENT DASHBOARD FUNCTION
 function initializePatientDashboard() {
   console.log("Initializing patient dashboard...");
 
-  // --- Navigation Buttons ---
   const btnPatientInfo = document.getElementById('btnPatientInfo');
   const btnQueue = document.getElementById('btnQueue');
   const btnInTreatment = document.getElementById('btnInTreatment');
 
-  // --- Content Sections ---
   const patientInfoSection = document.getElementById('patientInfoSection');
   const queueSection = document.getElementById('queueSection');
   const inTreatmentSection = document.getElementById('inTreatmentSection');
 
-  // --- Patient Modal ---
   const patientModal = document.getElementById('patientModal');
   const closeModalBtn = document.getElementById('closeModalBtn');
 
-  // --- Tab Buttons inside Modal ---
   const modalTabBtns = document.querySelectorAll('.tab-btn');
   const modalTabPanes = document.querySelectorAll('.tab-pane');
 
-  // --- Patient Tables ---
   const patientTableBody = document.querySelector("#patientTable tbody");
   const queueTableBody = document.querySelector("#queueTable tbody");
   const inTreatmentTableBody = document.querySelector("#inTreatmentTable tbody");
 
   // Initialize with empty data
-  const patients = []; // Empty array - no sample data
+  const patients = [];
 
   // --- Navigation Function ---
   function showSection(section) {
     console.log("Showing section:", section);
     
-    // Hide all sections
     if (patientInfoSection) patientInfoSection.classList.add('hidden');
     if (queueSection) queueSection.classList.add('hidden');
     if (inTreatmentSection) inTreatmentSection.classList.add('hidden');
 
-    // Remove active class from all buttons
     if (btnPatientInfo) btnPatientInfo.classList.remove('active');
     if (btnQueue) btnQueue.classList.remove('active');
     if (btnInTreatment) btnInTreatment.classList.remove('active');
 
-    // Show selected section and activate button
     switch(section) {
       case 'patientInfo':
         if (patientInfoSection) patientInfoSection.classList.remove('hidden');
@@ -455,35 +429,22 @@ function initializePatientDashboard() {
   function loadPatients(patients) {
     console.log("Loading patients:", patients.length);
     
-    // Clear tables
+    // Clear tables - leave them completely empty
     if (patientTableBody) patientTableBody.innerHTML = '';
     if (queueTableBody) queueTableBody.innerHTML = '';
     if (inTreatmentTableBody) inTreatmentTableBody.innerHTML = '';
 
-    // Display empty state if no patients
+    // If no patients, tables will remain empty (no message)
     if (patients.length === 0) {
-      const emptyMessage = `
-        <tr>
-          <td colspan="6" style="text-align: center; padding: 40px; color: #666; font-style: italic;">
-            No patients found. Register patients from the dashboard.
-          </td>
-        </tr>
-      `;
-      
-      if (patientTableBody) patientTableBody.innerHTML = emptyMessage;
-      if (queueTableBody) queueTableBody.innerHTML = emptyMessage;
-      if (inTreatmentTableBody) inTreatmentTableBody.innerHTML = emptyMessage;
-      
-      console.log("No patients to display");
+      console.log("No patients to display - tables are empty");
       return;
     }
 
     patients.forEach(patient => {
-      // Calculate wait time
       const waitTime = patient.status === 'WAITING' ? 
         (patient.waitTime || '0 min') : '-';
 
-      // --- Patient Info Table (All Patients - Only View Button) ---
+      // Patient Info Table
       if (patientTableBody) {
         const rowPatient = document.createElement('tr');
         rowPatient.innerHTML = `
@@ -498,7 +459,7 @@ function initializePatientDashboard() {
         patientTableBody.appendChild(rowPatient);
       }
 
-      // --- Queue Table (Level 2 & 3, waiting - Only Admit Button) ---
+      // Queue Table
       if (queueTableBody && patient.status === "WAITING") {
         const rowQueue = document.createElement('tr');
         rowQueue.innerHTML = `
@@ -514,7 +475,7 @@ function initializePatientDashboard() {
         queueTableBody.appendChild(rowQueue);
       }
 
-      // --- In-Treatment Table (Level 1, in treatment - Only Discharge Button) ---
+      // In-Treatment Table
       if (inTreatmentTableBody && patient.status === "IN_TREATMENT") {
         const rowTreatment = document.createElement('tr');
         rowTreatment.innerHTML = `
@@ -533,7 +494,7 @@ function initializePatientDashboard() {
 
     console.log("Tables populated, attaching button events...");
 
-    // --- Attach View Button Events (Patient Info Table Only) ---
+    // Attach button events
     document.querySelectorAll('.info-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const patientId = btn.getAttribute('data-patient-id');
@@ -543,31 +504,27 @@ function initializePatientDashboard() {
       });
     });
 
-    // --- Attach Admit Button Events (Queue Table) ---
     document.querySelectorAll('.admit-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
         const patientId = btn.getAttribute('data-patient-id');
         console.log("Admit button clicked for patient:", patientId);
         const patient = patients.find(p => p.id == patientId);
         if (patient) {
-          // Update status locally (no database update for now)
           patient.status = "IN_TREATMENT";
           patient.treatmentStart = new Date().toLocaleTimeString();
-          loadPatients(patients); // Refresh the display
+          loadPatients(patients);
         }
       });
     });
 
-    // --- Attach Discharge Button Events (In-Treatment Table) ---
     document.querySelectorAll('.discharge-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
         const patientId = btn.getAttribute('data-patient-id');
         console.log("Discharge button clicked for patient:", patientId);
         const patient = patients.find(p => p.id == patientId);
         if (patient) {
-          // Update status locally (no database update for now)
           patient.status = "TREATED";
-          loadPatients(patients); // Refresh the display
+          loadPatients(patients);
         }
       });
     });
@@ -577,7 +534,6 @@ function initializePatientDashboard() {
   function showPatientModal(patient) {
     console.log("Showing modal for patient:", patient.name);
     
-    // Update modal content
     const modalPatientName = document.getElementById('modalPatientName');
     const modalPatientId = document.getElementById('modalPatientId');
     const modalPatientAge = document.getElementById('modalPatientAge');
@@ -645,7 +601,6 @@ function initializePatientDashboard() {
     });
   }
 
-  // --- Click outside modal to close ---
   if (patientModal) {
     patientModal.addEventListener('click', e => {
       if (e.target === patientModal) patientModal.classList.add('hidden');
@@ -655,5 +610,5 @@ function initializePatientDashboard() {
   // Initialize dashboard with empty data
   loadPatients(patients);
   showSection('patientInfo');
-  console.log("Patient dashboard initialized successfully - EMPTY state");
+  console.log("Patient dashboard initialized successfully");
 }
