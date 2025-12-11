@@ -46,7 +46,10 @@
         <!-- National ID (REPLACED patientId) -->
         <div class="form-row">
           <input type="text" name="nationalId" placeholder="National ID" required>
-          <div class="none-option"></div>
+          <div class="none-option">
+            <input type="checkbox" id="nationalId-none" name="nationalId-none"> <!-- ADDED THIS LINE -->
+            <label for="nationalId-none">None</label> <!-- ADDED THIS LINE -->
+          </div>
         </div>
         
         <!-- Age -->

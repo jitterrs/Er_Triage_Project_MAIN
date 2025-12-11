@@ -32,13 +32,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const patientData = {
         id: formData.get('patientId') || generatePatientId(),
         name: formData.get('patientName'),
-        patientId: formData.get('patientId'),
+        nationalId: formData.get('nationalId'), // Updated from patientId
         age: formData.get('age'),
         gender: formData.get('gender'),
         symptoms: formData.get('symptoms'),
         currentMeds: formData.get('currentMeds'),
         medicalHistory: formData.get('medicalHistory'),
-        triageLevel: formData.get('triageLevel'),
         redFlag: formData.get('redFlag'),
         triageReason: formData.get('triageReason'),
         status: formData.get('status') || 'WAITING',
@@ -51,7 +50,6 @@ document.addEventListener("DOMContentLoaded", () => {
           spo2: formData.get('spo2'),
           temp: formData.get('temp')
         },
-        triageScore: formData.get('triageScore'),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
@@ -97,14 +95,17 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       inputField.disabled = false;
       resetFieldPlaceholder(inputField);
-      inputField.setAttribute('required', 'true');
+      // Only set required if field originally had required attribute
+      if (inputField.hasAttribute('data-originally-required')) {
+        inputField.setAttribute('required', 'true');
+      }
     }
   }
 
   function resetFieldPlaceholder(inputField) {
     const placeholders = {
       'patientName': 'Patient Name',
-      'patientId': 'Patient ID',
+      'nationalId': 'National ID', // Updated from patientId
       'age': 'Age',
       'symptoms': 'Symptoms',
       'currentMeds': 'Current Medications',
@@ -115,8 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
       'hr': 'e.g., 75',
       'rr': 'e.g., 16',
       'spo2': 'e.g., 98',
-      'temp': 'e.g., 36.8',
-      'triageScore': 'e.g., 8'
+      'temp': 'e.g., 36.8'
     };
     
     inputField.placeholder = placeholders[inputField.name] || 'Enter value';
@@ -130,12 +130,21 @@ document.addEventListener("DOMContentLoaded", () => {
     allInputs.forEach(input => {
       input.disabled = false;
       resetFieldPlaceholder(input);
-      input.setAttribute('required', 'true');
+      // Only add required if field was originally required
+      if (input.hasAttribute('data-originally-required')) {
+        input.setAttribute('required', 'true');
+      }
     });
   }
 
   // Initialize none checkbox functionality
   initializeNoneCheckboxes();
+
+  // Mark required fields on page load
+  const requiredFields = document.querySelectorAll('[required]');
+  requiredFields.forEach(field => {
+    field.setAttribute('data-originally-required', 'true');
+  });
 
   // --- INPUT VALIDATION ---
   function initializeInputValidation() {
@@ -144,7 +153,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const rrInput = document.querySelector('input[name="rr"]');
     const spo2Input = document.querySelector('input[name="spo2"]');
     const tempInput = document.querySelector('input[name="temp"]');
-    const triageScoreInput = document.querySelector('input[name="triageScore"]');
 
     if (ageInput) {
       ageInput.addEventListener('input', () => {
@@ -178,13 +186,6 @@ document.addEventListener("DOMContentLoaded", () => {
       tempInput.addEventListener('input', () => {
         if (tempInput.value < 34) tempInput.value = 34;
         if (tempInput.value > 42) tempInput.value = 42;
-      });
-    }
-
-    if (triageScoreInput) {
-      triageScoreInput.addEventListener('input', () => {
-        if (triageScoreInput.value < 0) triageScoreInput.value = 0;
-        if (triageScoreInput.value > 20) triageScoreInput.value = 20;
       });
     }
   }
@@ -402,87 +403,8 @@ function initializePatientDashboard() {
   const queueTableBody = document.querySelector("#queueTable tbody");
   const inTreatmentTableBody = document.querySelector("#inTreatmentTable tbody");
 
-  // Sample patient data
-  const samplePatients = [
-    {
-      id: "1",
-      name: "Noura",
-      age: "70",
-      gender: "F",
-      triageLevel: 2,
-      symptoms: "Chest pain, shortness of breath",
-      status: "WAITING",
-      waitTime: "15 min",
-      treatmentStart: "",
-      currentMeds: "Aspirin",
-      medicalHistory: "Hypertension",
-      vitals: {
-        bpSys: "102",
-        bpDia: "65",
-        hr: "96",
-        rr: "22",
-        spo2: "93",
-        temp: "37.8"
-      },
-      triageScore: "8",
-      redFlag: "No",
-      triageReason: "SBP 102; SpO2 93%; chest pain",
-      createdAt: "2025-01-15 10:15:00",
-      updatedAt: "2025-01-15 10:15:00"
-    },
-    {
-      id: "2",
-      name: "Ali",
-      age: "30",
-      gender: "M",
-      triageLevel: 3,
-      symptoms: "Mild abdominal pain",
-      status: "WAITING",
-      waitTime: "25 min",
-      treatmentStart: "",
-      currentMeds: "None",
-      medicalHistory: "None",
-      vitals: {
-        bpSys: "120",
-        bpDia: "80",
-        hr: "88",
-        rr: "18",
-        spo2: "97",
-        temp: "37.0"
-      },
-      triageScore: "3",
-      redFlag: "No",
-      triageReason: "Stable vitals, mild abdominal pain",
-      createdAt: "2025-01-15 10:20:00",
-      updatedAt: "2025-01-15 10:20:00"
-    },
-    {
-      id: "3",
-      name: "Sara",
-      age: "55",
-      gender: "F",
-      triageLevel: 1,
-      symptoms: "Severe chest pain, sweating",
-      status: "IN_TREATMENT",
-      waitTime: "5 min",
-      treatmentStart: "10:30 AM",
-      currentMeds: "Metformin",
-      medicalHistory: "Diabetes Type 2",
-      vitals: {
-        bpSys: "85",
-        bpDia: "55",
-        hr: "120",
-        rr: "30",
-        spo2: "84",
-        temp: "38.2"
-      },
-      triageScore: "12",
-      redFlag: "Yes",
-      triageReason: "SpO2 84%; SBP 85; severe chest pain",
-      createdAt: "2025-01-15 10:25:00",
-      updatedAt: "2025-01-15 10:30:00"
-    }
-  ];
+  // Initialize with empty data
+  const patients = []; // Empty array - no sample data
 
   // --- Navigation Function ---
   function showSection(section) {
@@ -538,10 +460,28 @@ function initializePatientDashboard() {
     if (queueTableBody) queueTableBody.innerHTML = '';
     if (inTreatmentTableBody) inTreatmentTableBody.innerHTML = '';
 
+    // Display empty state if no patients
+    if (patients.length === 0) {
+      const emptyMessage = `
+        <tr>
+          <td colspan="6" style="text-align: center; padding: 40px; color: #666; font-style: italic;">
+            No patients found. Register patients from the dashboard.
+          </td>
+        </tr>
+      `;
+      
+      if (patientTableBody) patientTableBody.innerHTML = emptyMessage;
+      if (queueTableBody) queueTableBody.innerHTML = emptyMessage;
+      if (inTreatmentTableBody) inTreatmentTableBody.innerHTML = emptyMessage;
+      
+      console.log("No patients to display");
+      return;
+    }
+
     patients.forEach(patient => {
       // Calculate wait time
       const waitTime = patient.status === 'WAITING' ? 
-        (Math.floor(Math.random() * 30) + 5) + ' min' : '-';
+        (patient.waitTime || '0 min') : '-';
 
       // --- Patient Info Table (All Patients - Only View Button) ---
       if (patientTableBody) {
@@ -549,8 +489,8 @@ function initializePatientDashboard() {
         rowPatient.innerHTML = `
           <td>${patient.id}</td>
           <td>${patient.name}</td>
-          <td><span class="triage-level level-${patient.triageLevel}">Level ${patient.triageLevel}</span></td>
-          <td>${patient.symptom || patient.symptoms}</td>
+          <td><span class="triage-level level-${patient.triageLevel || 3}">Level ${patient.triageLevel || 3}</span></td>
+          <td>${patient.symptoms || '-'}</td>
           <td class="text-right">
             <button class="info-btn" data-patient-id="${patient.id}">View Info</button>
           </td>
@@ -559,13 +499,13 @@ function initializePatientDashboard() {
       }
 
       // --- Queue Table (Level 2 & 3, waiting - Only Admit Button) ---
-      if (queueTableBody && patient.triageLevel >= 2 && patient.status === "WAITING") {
+      if (queueTableBody && patient.status === "WAITING") {
         const rowQueue = document.createElement('tr');
         rowQueue.innerHTML = `
           <td>${patient.id}</td>
           <td>${patient.name}</td>
-          <td><span class="triage-level level-${patient.triageLevel}">Level ${patient.triageLevel}</span></td>
-          <td>${patient.symptom || patient.symptoms}</td>
+          <td><span class="triage-level level-${patient.triageLevel || 3}">Level ${patient.triageLevel || 3}</span></td>
+          <td>${patient.symptoms || '-'}</td>
           <td>${waitTime}</td>
           <td class="text-right">
             <button class="action-btn admit-btn" data-patient-id="${patient.id}">Admit to Treatment</button>
@@ -575,13 +515,13 @@ function initializePatientDashboard() {
       }
 
       // --- In-Treatment Table (Level 1, in treatment - Only Discharge Button) ---
-      if (inTreatmentTableBody && patient.triageLevel === 1 && patient.status === "IN_TREATMENT") {
+      if (inTreatmentTableBody && patient.status === "IN_TREATMENT") {
         const rowTreatment = document.createElement('tr');
         rowTreatment.innerHTML = `
           <td>${patient.id}</td>
           <td>${patient.name}</td>
-          <td><span class="triage-level level-${patient.triageLevel}">Level ${patient.triageLevel}</span></td>
-          <td>${patient.symptom || patient.symptoms}</td>
+          <td><span class="triage-level level-${patient.triageLevel || 1}">Level ${patient.triageLevel || 1}</span></td>
+          <td>${patient.symptoms || '-'}</td>
           <td>${patient.treatmentStart || '-'}</td>
           <td class="text-right">
             <button class="action-btn discharge-btn" data-patient-id="${patient.id}">Discharge</button>
@@ -664,20 +604,20 @@ function initializePatientDashboard() {
     if (modalPatientAge) modalPatientAge.textContent = patient.age || '-';
     if (modalPatientGender) modalPatientGender.textContent = patient.gender === 'M' ? 'Male' : patient.gender === 'F' ? 'Female' : 'Other';
     if (modalTriageLevel) modalTriageLevel.textContent = patient.triageLevel || '-';
-    if (modalSymptoms) modalSymptoms.textContent = patient.symptom || patient.symptoms || '-';
-    if (modalCurrentMeds) modalCurrentMeds.textContent = patient.current_medications || patient.currentMeds || '-';
-    if (modalPastHistory) modalPastHistory.textContent = patient.past_medical_history || patient.medicalHistory || '-';
-    if (modalBpSys) modalBpSys.textContent = patient.bp_sys || patient.vitals?.bpSys || '-';
-    if (modalBpDia) modalBpDia.textContent = patient.bp_dia || patient.vitals?.bpDia || '-';
-    if (modalHr) modalHr.textContent = patient.hr || patient.vitals?.hr || '-';
-    if (modalRr) modalRr.textContent = patient.rr || patient.vitals?.rr || '-';
-    if (modalSpo2) modalSpo2.textContent = patient.spo2 || patient.vitals?.spo2 || '-';
-    if (modalTemp) modalTemp.textContent = patient.temp || patient.vitals?.temp || '-';
-    if (modalTriageScore) modalTriageScore.textContent = patient.triage_score || patient.triageScore || '-';
-    if (modalRedFlag) modalRedFlag.textContent = patient.red_flag ? 'Yes' : patient.redFlag || 'No';
-    if (modalTriageReason) modalTriageReason.textContent = patient.triage_reason || patient.triageReason || '-';
-    if (modalCreatedAt) modalCreatedAt.textContent = patient.created_at || patient.createdAt || '-';
-    if (modalUpdatedAt) modalUpdatedAt.textContent = patient.updated_at || patient.updatedAt || '-';
+    if (modalSymptoms) modalSymptoms.textContent = patient.symptoms || '-';
+    if (modalCurrentMeds) modalCurrentMeds.textContent = patient.currentMeds || '-';
+    if (modalPastHistory) modalPastHistory.textContent = patient.medicalHistory || '-';
+    if (modalBpSys) modalBpSys.textContent = patient.vitals?.bp?.split('/')[0] || '-';
+    if (modalBpDia) modalBpDia.textContent = patient.vitals?.bp?.split('/')[1] || '-';
+    if (modalHr) modalHr.textContent = patient.vitals?.hr || '-';
+    if (modalRr) modalRr.textContent = patient.vitals?.rr || '-';
+    if (modalSpo2) modalSpo2.textContent = patient.vitals?.spo2 || '-';
+    if (modalTemp) modalTemp.textContent = patient.vitals?.temp || '-';
+    if (modalTriageScore) modalTriageScore.textContent = patient.triageScore || '-';
+    if (modalRedFlag) modalRedFlag.textContent = patient.redFlag || 'No';
+    if (modalTriageReason) modalTriageReason.textContent = patient.triageReason || '-';
+    if (modalCreatedAt) modalCreatedAt.textContent = patient.createdAt || '-';
+    if (modalUpdatedAt) modalUpdatedAt.textContent = patient.updatedAt || '-';
     if (modalStatus) modalStatus.textContent = patient.status === 'WAITING' ? 'Waiting' : 
                                               patient.status === 'IN_TREATMENT' ? 'In Treatment' : 'Treated';
 
@@ -712,8 +652,8 @@ function initializePatientDashboard() {
     });
   }
 
-  // Initialize dashboard
-  loadPatients(samplePatients);
+  // Initialize dashboard with empty data
+  loadPatients(patients);
   showSection('patientInfo');
-  console.log("Patient dashboard initialized successfully");
+  console.log("Patient dashboard initialized successfully - EMPTY state");
 }
