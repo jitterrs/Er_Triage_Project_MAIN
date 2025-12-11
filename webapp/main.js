@@ -1,6 +1,14 @@
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOM loaded - checking for dashboard elements...");
 
+  // --- AUTO-FILL ADMIN LOGIN ---
+  const usernameField = document.getElementById("username");
+  const passwordField = document.getElementById("password");
+  if (usernameField && passwordField) {
+    usernameField.value = "admin";
+    passwordField.value = "1234";  // <-- set your admin password here
+  }
+
   // --- ACCESSIBILITY FUNCTIONALITY ---
   initializeAccessibility();
 
@@ -106,12 +114,12 @@ document.addEventListener("DOMContentLoaded", () => {
       'medicalHistory': 'Past Medical History',
       'triageReason': 'Triage Reason',
       'waitTime': 'Wait Time (e.g., 15 min)',
-      'bp': 'e.g., 120/80',
-      'hr': 'e.g., 75',
-      'rr': 'e.g., 16',
-      'spo2': 'e.g., 98',
-      'temp': 'e.g., 36.8',
-      'triageScore': 'e.g., 8'
+      'bp': '120/80',
+      'hr': '75',
+      'rr': '16',
+      'spo2': '98',
+      'temp': '36.8',
+      'triageScore': '8'
     };
 
     inputField.placeholder = placeholders[inputField.name] || 'Enter value';
@@ -192,7 +200,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-// --- LOGIN FUNCTIONALITY (FULLY FIXED) ---
   // --- LOGIN FUNCTIONALITY (FINAL) ---
   const loginForm = document.getElementById("loginForm");
 
@@ -233,10 +240,6 @@ document.addEventListener("DOMContentLoaded", () => {
         message.textContent = "Login successful!";
         message.style.color = "lightgreen";
 
-        // Optionally store nurse info for later use
-        // localStorage.setItem("nurseId", data.id);
-        // localStorage.setItem("nurseUsername", data.username);
-
         setTimeout(() => {
           window.location.href = "dashboard.html";
         }, 700);
@@ -248,8 +251,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-
-
 
   // PATIENT DASHBOARD LOGIC
   if (document.getElementById('btnPatientInfo')) {
