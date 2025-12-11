@@ -29,6 +29,33 @@ document.addEventListener("DOMContentLoaded", () => {
       
       // Collect form data
       const formData = new FormData(patientForm);
+      
+      // Generate triage level based on symptoms/vitals (simplified logic)
+      const symptoms = formData.get('symptoms') || '';
+      const redFlag = formData.get('redFlag') || 'No';
+      const bp = formData.get('bp') || '';
+      const hr = formData.get('hr') || '';
+      const spo2 = formData.get('spo2') || '';
+      
+      // Simple triage calculation (in real app, use proper algorithm)
+      let triageLevel = 5; // Default to green (least urgent)
+      
+      if (redFlag === 'Yes' || symptoms.toLowerCase().includes('chest pain') || 
+          symptoms.toLowerCase().includes('difficulty breathing')) {
+        triageLevel = 1; // Red - most urgent
+      } else if (symptoms.toLowerCase().includes('severe') || 
+                 (bp && (parseInt(bp.split('/')[0]) < 90 || parseInt(bp.split('/')[0]) > 180))) {
+        triageLevel = 2; // Orange
+      } else if (symptoms.toLowerCase().includes('moderate') || 
+                 (hr && (parseInt(hr) > 120 || parseInt(hr) < 50))) {
+        triageLevel = 3; // Yellow
+      } else if (symptoms.toLowerCase().includes('mild') || 
+                 (spo2 && parseInt(spo2) < 95)) {
+        triageLevel = 4; // Light Green
+      } else {
+        triageLevel = 5; // Dark Green - least urgent
+      }
+      
       const patientData = {
         id: formData.get('patientId') || generatePatientId(),
         name: formData.get('patientName'),
@@ -38,8 +65,9 @@ document.addEventListener("DOMContentLoaded", () => {
         symptoms: formData.get('symptoms'),
         currentMeds: formData.get('currentMeds'),
         medicalHistory: formData.get('medicalHistory'),
-        redFlag: formData.get('redFlag'),
+        redFlag: redFlag,
         triageReason: formData.get('triageReason'),
+        triageLevel: triageLevel, // Added triage level
         status: formData.get('status') || 'WAITING',
         waitTime: formData.get('waitTime') || '0 min',
         treatmentStart: formData.get('treatmentStart'),
@@ -58,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log('Patient Registration Data:', patientData);
       
       // Show success message
-      alert('Patient registered successfully!');
+      alert(`Patient registered successfully! Triage Level: ${triageLevel}`);
       
       // Reset form and close modal
       patientForm.reset();
@@ -450,7 +478,7 @@ function initializePatientDashboard() {
         rowPatient.innerHTML = `
           <td>${patient.id}</td>
           <td>${patient.name}</td>
-          <td><span class="triage-level level-${patient.triageLevel || 3}">Level ${patient.triageLevel || 3}</span></td>
+          <td><span class="triage-level level-${patient.triageLevel || 5}">Level ${patient.triageLevel || 5}</span></td>
           <td>${patient.symptoms || '-'}</td>
           <td class="text-right">
             <button class="info-btn" data-patient-id="${patient.id}">View Info</button>
@@ -459,13 +487,13 @@ function initializePatientDashboard() {
         patientTableBody.appendChild(rowPatient);
       }
 
-      // Queue Table
+      // Queue Table (Level 1-5, waiting)
       if (queueTableBody && patient.status === "WAITING") {
         const rowQueue = document.createElement('tr');
         rowQueue.innerHTML = `
           <td>${patient.id}</td>
           <td>${patient.name}</td>
-          <td><span class="triage-level level-${patient.triageLevel || 3}">Level ${patient.triageLevel || 3}</span></td>
+          <td><span class="triage-level level-${patient.triageLevel || 5}">Level ${patient.triageLevel || 5}</span></td>
           <td>${patient.symptoms || '-'}</td>
           <td>${waitTime}</td>
           <td class="text-right">
@@ -475,7 +503,7 @@ function initializePatientDashboard() {
         queueTableBody.appendChild(rowQueue);
       }
 
-      // In-Treatment Table
+      // In-Treatment Table (Level 1-5, in treatment)
       if (inTreatmentTableBody && patient.status === "IN_TREATMENT") {
         const rowTreatment = document.createElement('tr');
         rowTreatment.innerHTML = `

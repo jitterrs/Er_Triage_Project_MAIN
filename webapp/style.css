@@ -680,6 +680,7 @@ tr:hover {
 }
 
 /* Triage Level Badges */
+/* Triage Level Badges - Updated for 5 levels */
 .triage-level {
   padding: 4px 12px;
   border-radius: 20px;
@@ -688,24 +689,43 @@ tr:hover {
   text-transform: uppercase;
   display: inline-block;
   text-align: center;
-  min-width: 60px;
+  min-width: 70px;
 }
 
+/* Level 1 - Red (Most Urgent) */
 .level-1 {
-  background: #dc3545;
-  color: white;
+  background: #dc3545 !important;
+  color: white !important;
+  border: 1px solid #c82333 !important;
 }
 
+/* Level 2 - Orange */
 .level-2 {
-  background: #fd7e14;
-  color: white;
+  background: #fd7e14 !important;
+  color: white !important;
+  border: 1px solid #e06c10 !important;
 }
 
+/* Level 3 - Yellow */
 .level-3 {
-  background: #ffc107;
-  color: #212529;
+  background: #ffc107 !important;
+  color: #212529 !important;
+  border: 1px solid #e0a800 !important;
 }
 
+/* Level 4 - Light Green */
+.level-4 {
+  background: #28a745 !important;
+  color: white !important;
+  border: 1px solid #218838 !important;
+}
+
+/* Level 5 - Dark Green (Least Urgent) */
+.level-5 {
+  background: #155724 !important;
+  color: white !important;
+  border: 1px solid #0f4018 !important;
+}
 /* Action Buttons */
 .info-btn, .action-btn {
   padding: 8px 16px;
