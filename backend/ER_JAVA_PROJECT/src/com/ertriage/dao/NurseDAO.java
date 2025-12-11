@@ -1,39 +1,52 @@
 package com.ertriage.dao;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import com.ertriage.model.Nurse;
 
 public class NurseDAO {
 
-    private final Connection conn;
-
-    public NurseDAO(Connection conn) {
-        this.conn = conn;
+    // NurseDAO handles its own DB connection internally
+    private Connection getConnection() throws SQLException {
+        // Use the same DB settings pattern as PatientDAO / AuditLogDAO
+        String url  = "jdbc:mysql://localhost:3306/er_triage_db";
+        String user = "root";      // TODO: adjust to your DB username if needed
+        String pass = "Alya1020";  // TODO: adjust to your DB password if needed
+        return DriverManager.getConnection(url, user, pass);
     }
 
+    /**
+     * Authenticate nurse by username/password.
+     * Returns a Nurse object if credentials are valid, otherwise null.
+     */
     public Nurse authenticate(String username, String password) {
-        try {
-            String sql = "SELECT * FROM nurses WHERE username = ? AND password = ?";
-            PreparedStatement stmt = conn.prepareStatement(sql);
+        String sql = "SELECT * FROM nurses WHERE username = ? AND password = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setString(1, username);
             stmt.setString(2, password);
 
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                Nurse nurse = new Nurse();
-                nurse.setId(rs.getInt("id"));
-                nurse.setUsername(rs.getString("username"));
-                nurse.setPassword(rs.getString("password"));
-                return nurse;
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Nurse nurse = new Nurse();
+                    nurse.setId(rs.getInt("id"));
+                    nurse.setUsername(rs.getString("username"));
+                    nurse.setPassword(rs.getString("password"));
+                    return nurse;
+                }
             }
-        } catch (Exception e) {
+
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return null; // login failed
+        // login failed
+        return null;
     }
 }

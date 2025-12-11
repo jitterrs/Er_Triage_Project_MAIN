@@ -6,6 +6,20 @@ public class LoginRequest {
 
     public LoginRequest() {}
 
-    public String getUsername() { return username; }
-    public String getPassword() { return password; }
+    public String getUsername() { 
+        return username; 
+    }
+
+    public String getPassword() { 
+        return password; 
+    }
+
+    // Added setters so we can populate this DTO from the servlet
+    public void setUsername(String username) { 
+        this.username = username; 
+    }
+
+    public void setPassword(String password) { 
+        this.password = password; 
+    }
 }

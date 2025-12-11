@@ -6,6 +6,7 @@
                         https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
     version="6.0">
 
+    <!-- Existing example servlet -->
     <servlet>
         <servlet-name>ExampleServlet</servlet-name>
         <servlet-class>com.yourapp.controllers.ExampleServlet</servlet-class>
@@ -14,6 +15,17 @@
     <servlet-mapping>
         <servlet-name>ExampleServlet</servlet-name>
         <url-pattern>/api/example</url-pattern>
+    </servlet-mapping>
+
+    <!-- NEW: Login servlet exposing /api/login -->
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>com.ertriage.web.LoginServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/api/login</url-pattern>
     </servlet-mapping>
 
 </web-app>

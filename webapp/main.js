@@ -192,7 +192,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- FIXED LOGIN FUNCTIONALITY ---
+// --- LOGIN FUNCTIONALITY (FULLY FIXED) ---
+  // --- LOGIN FUNCTIONALITY (FINAL) ---
   const loginForm = document.getElementById("loginForm");
 
   if (loginForm) {
@@ -203,23 +204,38 @@ document.addEventListener("DOMContentLoaded", () => {
       const password = document.getElementById("password").value.trim();
       const message = document.getElementById("loginMessage");
 
+      if (!username || !password) {
+        message.textContent = "Please enter username and password.";
+        message.style.color = "red";
+        return;
+      }
+
+      message.textContent = "Logging in...";
+      message.style.color = "black";
+
       try {
-        const res = await fetch("/api/login", {   // FIXED URL HERE
+        const res = await fetch("/api/login", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, password })
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: new URLSearchParams({ username, password }).toString()
         });
 
         const data = await res.json();
 
-        if (!data.success) {
-          message.textContent = "Invalid credentials";
+        if (!res.ok || !data.success) {
+          message.textContent = data.message || "Invalid credentials";
           message.style.color = "red";
           return;
         }
 
         message.textContent = "Login successful!";
         message.style.color = "lightgreen";
+
+        // Optionally store nurse info for later use
+        // localStorage.setItem("nurseId", data.id);
+        // localStorage.setItem("nurseUsername", data.username);
 
         setTimeout(() => {
           window.location.href = "dashboard.html";
@@ -232,6 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
 
 
   // PATIENT DASHBOARD LOGIC
