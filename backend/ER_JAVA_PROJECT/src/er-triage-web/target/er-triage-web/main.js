@@ -11,7 +11,6 @@
 // =====================================================================
 
 // Global Elements
-
 const patientForm = document.getElementById('patientForm');
 const patientTableBody = document.getElementById('patientTableBody');
 const registerBox = document.getElementById('registerBox');
@@ -40,47 +39,6 @@ async function apiPost(path, bodyObj) {
     });
     return await res.json();
 }
-
-const API_BASE = "/er-triage-web/api";
-
-async function createPatient() {
-    const name = document.getElementById("name").value;
-    const age = parseInt(document.getElementById("age").value);
-    const gender = document.getElementById("gender").value;
-    const symptoms = document.getElementById("symptoms").value;
-
-    const payload = {
-        name,
-        age,
-        gender,
-        symptoms
-    };
-
-    try {
-        const response = await fetch(`${API_BASE}/patients`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-            throw new Error("Failed to create patient");
-        }
-
-        const patient = await response.json();
-
-        alert(`Patient created!\nID: ${patient.id}\nTriage Level: ${patient.triageLevel}`);
-        console.log(patient);
-
-    } catch (err) {
-        console.error(err);
-        alert("Error creating patient");
-    }
-}
-
-
 
 
 // =====================================================================
@@ -219,7 +177,6 @@ function attachActionButtons() {
         });
     });
 }
-
 
 
 // =====================================================================

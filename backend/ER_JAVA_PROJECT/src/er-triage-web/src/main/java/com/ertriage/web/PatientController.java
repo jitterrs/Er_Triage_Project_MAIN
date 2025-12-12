@@ -61,4 +61,9 @@ public class PatientController {
         return patientService.changeStatus(id, req);
     }
 
+    public List<PatientView> listInTreatment(int page, int size, String nameFilter) {
+    return queueService.listInTreatment(page, size, nameFilter);
+}
+
+
 }

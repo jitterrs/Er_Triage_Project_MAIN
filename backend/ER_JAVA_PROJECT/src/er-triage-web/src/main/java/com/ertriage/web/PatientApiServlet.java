@@ -111,39 +111,52 @@ public class PatientApiServlet extends HttpServlet {
 
     // ========== GET: list & get by id ==========
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String path = req.getPathInfo();  // may be null, "/", or "/{id}"
+   @Override
+protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    resp.setHeader("X-ERTRIAGE-BUILD", "IN_TREATMENT_ROUTE_OK");
+    String path = req.getPathInfo();  // null, "/", "/{id}", or "/inTreatment"
 
-        try {
-            if (path == null || "/".equals(path)) {
-                // GET /api/patients?page=&size=&name=
-                int page = parseIntOrDefault(req.getParameter("page"), 0);
-                int size = parseIntOrDefault(req.getParameter("size"), 20);
-                String nameFilter = req.getParameter("name");
+    try {
+        // ✅ Special route first
+        if ("/inTreatment".equals(path)) {
+            int page = parseIntOrDefault(req.getParameter("page"), 0);
+            int size = parseIntOrDefault(req.getParameter("size"), 20);
+            String nameFilter = req.getParameter("name");
 
-                List<PatientView> list = patientController.listWaiting(page, size, nameFilter);
-                writeJson(resp, HttpServletResponse.SC_OK, list);
-                return;
-            }
-
-            // Expect "/{id}"
-            String[] parts = path.split("/");
-            if (parts.length >= 2 && !parts[1].isEmpty()) {
-                long id = parseId(parts[1]);
-                PatientView view = patientController.getPatient(id);
-                writeJson(resp, HttpServletResponse.SC_OK, view);
-            } else {
-                writeError(resp, HttpServletResponse.SC_NOT_FOUND, "Invalid patient path");
-            }
-
-        } catch (IllegalArgumentException ex) {
-            writeError(resp, HttpServletResponse.SC_BAD_REQUEST, ex.getMessage());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            writeError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server error");
+            List<PatientView> list = patientController.listInTreatment(page, size, nameFilter);
+            writeJson(resp, HttpServletResponse.SC_OK, list);
+            return;
         }
+
+        // Existing behavior: list waiting
+        if (path == null || "/".equals(path)) {
+            int page = parseIntOrDefault(req.getParameter("page"), 0);
+            int size = parseIntOrDefault(req.getParameter("size"), 20);
+            String nameFilter = req.getParameter("name");
+
+            List<PatientView> list = patientController.listWaiting(page, size, nameFilter);
+            writeJson(resp, HttpServletResponse.SC_OK, list);
+            return;
+        }
+
+        // Existing behavior: GET by id
+        String[] parts = path.split("/");
+        if (parts.length >= 2 && !parts[1].isEmpty()) {
+            long id = parseId(parts[1]);
+            PatientView view = patientController.getPatient(id);
+            writeJson(resp, HttpServletResponse.SC_OK, view);
+        } else {
+            writeError(resp, HttpServletResponse.SC_NOT_FOUND, "Invalid patient path");
+        }
+
+    } catch (IllegalArgumentException ex) {
+        writeError(resp, HttpServletResponse.SC_BAD_REQUEST, ex.getMessage());
+    } catch (Exception ex) {
+        ex.printStackTrace();
+        writeError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server error");
     }
+}
+
 
     // ========== POST: create & actions ==========
 

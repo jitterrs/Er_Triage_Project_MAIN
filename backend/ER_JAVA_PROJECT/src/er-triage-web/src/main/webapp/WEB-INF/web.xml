@@ -8,3 +8,13 @@
 <url-pattern>/api/example</url-pattern>
 </servlet-mapping>
 </web-app>
+
+<servlet>
+  <servlet-name>QueueApiServlet</servlet-name>
+  <servlet-class>com.ertriage.web.QueueApiServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+  <servlet-name>QueueApiServlet</servlet-name>
+  <url-pattern>/api/queue/*</url-pattern>
+</servlet-mapping>

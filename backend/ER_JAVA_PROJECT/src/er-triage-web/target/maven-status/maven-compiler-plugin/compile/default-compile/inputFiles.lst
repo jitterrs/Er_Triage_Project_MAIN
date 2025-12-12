@@ -14,6 +14,7 @@ D:\Er_Triage_Project_MAIN\backend\ER_JAVA_PROJECT\src\er-triage-web\src\main\jav
 D:\Er_Triage_Project_MAIN\backend\ER_JAVA_PROJECT\src\er-triage-web\src\main\java\com\ertriage\model\Status.java
 D:\Er_Triage_Project_MAIN\backend\ER_JAVA_PROJECT\src\er-triage-web\src\main\java\com\ertriage\web\MetricsController.java
 D:\Er_Triage_Project_MAIN\backend\ER_JAVA_PROJECT\src\er-triage-web\src\main\java\com\ertriage\dto\WaitingRoomView.java
+D:\Er_Triage_Project_MAIN\backend\ER_JAVA_PROJECT\src\er-triage-web\src\main\java\com\ertriage\web\QueueApiServlet.java
 D:\Er_Triage_Project_MAIN\backend\ER_JAVA_PROJECT\src\er-triage-web\src\main\java\com\ertriage\dto\CreatePatientRequest.java
 D:\Er_Triage_Project_MAIN\backend\ER_JAVA_PROJECT\src\er-triage-web\src\main\java\com\ertriage\service\PatientService.java
 D:\Er_Triage_Project_MAIN\backend\ER_JAVA_PROJECT\src\er-triage-web\src\main\java\com\ertriage\dao\AuditLogDAO.java

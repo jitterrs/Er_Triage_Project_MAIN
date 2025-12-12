@@ -88,4 +88,22 @@ public class QueueService {
         }
         return counts;
     }
+
+    public List<PatientView> listInTreatment(int page, int size, String nameFilter) {
+    int offset = page * size;
+    List<Patient> patients = patientDAO.listByStatus("IN_TREATMENT", offset, size, nameFilter);
+
+    List<PatientView> result = new ArrayList<>();
+    for (Patient p : patients) {
+        PatientView v = new PatientView();
+        v.id = p.id;
+        v.name = p.name;
+        v.triageLevel = p.triageLevel;
+        v.triageScore = p.triageScore;
+        v.status = p.status;
+        result.add(v);
+    }
+    return result;
+}
+
 }

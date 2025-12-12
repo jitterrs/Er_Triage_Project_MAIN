@@ -264,4 +264,36 @@ public Patient update(Patient p) {
     return p;
 }
 
+public List<Patient> listByStatus(String status, int offset, int limit, String nameFilter) {
+    List<Patient> result = new ArrayList<>();
+
+    StringBuilder sb = new StringBuilder("SELECT * FROM patients WHERE status = ?");
+    boolean hasFilter = nameFilter != null && !nameFilter.isBlank();
+    if (hasFilter) sb.append(" AND name LIKE ?");
+
+    sb.append(" ORDER BY triage_level, triage_score DESC, created_at, age DESC");
+    sb.append(" LIMIT ? OFFSET ?");
+
+    try (Connection conn = getConnection();
+         PreparedStatement ps = conn.prepareStatement(sb.toString())) {
+
+        int index = 1;
+        ps.setString(index++, status);
+        if (hasFilter) ps.setString(index++, "%" + nameFilter + "%");
+
+        ps.setInt(index++, limit);
+        ps.setInt(index, offset);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) result.add(mapRowToPatient(rs));
+        }
+
+    } catch (SQLException e) {
+        throw new RuntimeException("Error listing patients by status=" + status, e);
+    }
+
+    return result;
+}
+
+
 }
