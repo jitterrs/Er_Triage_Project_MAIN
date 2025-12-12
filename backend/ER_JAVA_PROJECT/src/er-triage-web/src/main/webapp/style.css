@@ -1135,3 +1135,53 @@ tr:hover {
     font-size: 1.1rem;
   }
 }
+
+/* Base button */
+.btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+/* Primary (Register / Admit) */
+.btn-primary {
+  background: #0d6efd;
+  color: #fff;
+}
+.btn-primary:hover {
+  background: #0b5ed7;
+}
+
+/* Secondary (View) */
+.btn-secondary {
+  background: #f1f3f5;
+  color: #333;
+}
+.btn-secondary:hover {
+  background: #e9ecef;
+}
+
+/* Danger (Discharge / Cancel) */
+.btn-danger {
+  background: #dc3545;
+  color: #fff;
+}
+.btn-danger:hover {
+  background: #bb2d3b;
+}
+
+/* Small buttons (table actions) */
+.btn-sm {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+/* Disabled state */
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

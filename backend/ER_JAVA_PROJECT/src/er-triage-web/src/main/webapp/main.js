@@ -1,326 +1,491 @@
 // =====================================================================
-//  MAIN.JS – Backend Connected Version
-//  Works with the following API endpoints:
-//
-//  POST   /er-triage-web/api/patients
-//  GET    /er-triage-web/api/patients
-//  GET    /er-triage-web/api/patients/{id}
-//  POST   /er-triage-web/api/patients/{id}/status
-//  POST   /er-triage-web/api/patients/{id}/vitals   (future)
-//  POST   /er-triage-web/api/patients/{id}/symptoms (future)
+// MAIN.JS – Page-safe + Backend Connected (Auto context)
+// Context example: http://localhost:8080/er-triage-web/
 // =====================================================================
 
-// Global Elements
-const patientForm = document.getElementById('patientForm');
-const patientTableBody = document.getElementById('patientTableBody');
-const registerBox = document.getElementById('registerBox');
+(() => {
+  "use strict";
 
-// ==========================================================
-//  Helper: Reset "None" checkboxes in symptoms list
-// ==========================================================
-function resetNoneCheckboxes() {
-    document.getElementById("none").checked = false;
-}
+  // ==========================================================
+  // Auto-detect context path (e.g. "/er-triage-web")
+  // ==========================================================
+  function detectContextPath() {
+    const parts = window.location.pathname.split("/").filter(Boolean);
+    if (parts.length === 0) return "";
+    return "/" + parts[0];
+  }
 
+  const APP_CTX = detectContextPath();
+  const API_BASE = `${APP_CTX}/api`;
 
-// =====================================================================
-//  BACKEND API HELPERS
-// =====================================================================
-async function apiGet(path) {
-    const res = await fetch(`/er-triage-web${path}`);
-    return await res.json();
-}
+  // ==========================================================
+  // Helpers
+  // ==========================================================
+  const qs = (sel, root = document) => root.querySelector(sel);
+  const qsa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-async function apiPost(path, bodyObj) {
-    const res = await fetch(`/er-triage-web${path}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(bodyObj)
+  function toIntOrNull(v) {
+    const s = String(v ?? "").trim();
+    if (!s) return null;
+    const n = Number.parseInt(s, 10);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function toFloatOrNull(v) {
+    const s = String(v ?? "").trim();
+    if (!s) return null;
+    const n = Number.parseFloat(s);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function escapeHtml(str) {
+    return String(str ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  // ==========================================================
+  // API
+  // ==========================================================
+  async function apiGet(path) {
+    const url = `${API_BASE}${path}`;
+    const res = await fetch(url, {
+      method: "GET",
+      headers: { Accept: "application/json" },
     });
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(`GET ${url} failed: ${res.status} ${text}`);
+    }
     return await res.json();
-}
+  }
 
+  async function apiPost(path, body) {
+    const url = `${API_BASE}${path}`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(body ?? {}),
+    });
 
-// =====================================================================
-//  REGISTER NEW PATIENT  → POST /api/patients
-// =====================================================================
-patientForm.addEventListener('submit', async function (event) {
-    event.preventDefault();
-
-    // Read form inputs
-    const name = document.getElementById('fullName').value;
-    const age = parseInt(document.getElementById('age').value);
-    const gender = document.getElementById('gender').value;
-
-    // Symptoms
-    const symptomCheckboxes = document.querySelectorAll('.symptom:checked');
-    let symptoms = [];
-
-    symptomCheckboxes.forEach(cb => symptoms.push(cb.value));
-
-    if (symptoms.includes("None")) {
-        symptoms = ["None"];
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(`POST ${url} failed: ${res.status} ${text}`);
     }
 
-    const patientData = {
-        name: name,
-        age: age,
-        gender: gender,
-        symptoms: symptoms.join(", ")
-    };
-
+    const text = await res.text().catch(() => "");
+    if (!text) return {};
     try {
-        const created = await apiPost('/api/patients', patientData);
+      return JSON.parse(text);
+    } catch {
+      return {};
+    }
+  }
 
-        alert(`Patient registered successfully! Triage Level: ${created.triageLevel}`);
+  // ==========================================================
+  // Login page (index.html)
+  // ==========================================================
+  function initLoginPage() {
+    const loginForm = qs("#loginForm");
+    if (!loginForm) return;
+
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      window.location.href = `${APP_CTX}/dashboard.html`;
+    });
+  }
+
+  // ==========================================================
+  // Dashboard page (dashboard.html)
+  //  IDs confirmed in your dashboard.html:
+  //  viewBtn, registerBtn, registerBox, patientForm, newRegisterBtn, cancelRegister
+  // ==========================================================
+  function initDashboardPage() {
+    const registerBox = qs("#registerBox");
+    const registerBtn = qs("#registerBtn");
+    const viewBtn = qs("#viewBtn");
+    const patientForm = qs("#patientForm");
+    const cancelRegister = qs("#cancelRegister");
+
+    // Only run if this looks like dashboard.html
+    if (!registerBox && !registerBtn && !viewBtn && !patientForm) return;
+
+    // Default hide register box (if not already hidden by CSS)
+    if (registerBox && getComputedStyle(registerBox).display !== "none") {
+      // keep it visible if your CSS already controls it; but prevent "stuck" behavior
+      // (no forced hide here)
+    }
+
+    if (viewBtn) {
+      viewBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.location.href = `${APP_CTX}/patientDashboard.html`;
+      });
+    }
+
+    if (registerBtn && registerBox) {
+      registerBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        registerBox.style.display = "block";
+      });
+    }
+
+    // Cancel button must NOT submit anything
+    if (cancelRegister && registerBox) {
+      cancelRegister.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Hide and reset
+        registerBox.style.display = "none";
+        if (patientForm) patientForm.reset();
+
+        // Re-enable fields disabled by "none" checkboxes
+        qsa('input[type="checkbox"][id$="-none"]').forEach((cb) => {
+          cb.checked = false;
+          const row = cb.closest(".form-row");
+          if (!row) return;
+          const field = row.querySelector(
+            'input:not([type="checkbox"]), textarea, select'
+          );
+          if (field) field.disabled = false;
+        });
+      });
+    }
+
+    // "None" checkbox behavior (disable/enable the field in the same row)
+    qsa('input[type="checkbox"][id$="-none"]').forEach((cb) => {
+      cb.addEventListener("change", () => {
+        const row = cb.closest(".form-row");
+        if (!row) return;
+
+        const field = row.querySelector(
+          'input:not([type="checkbox"]), textarea, select'
+        );
+        if (!field) return;
+
+        if (cb.checked) {
+          field.value = "";
+          field.disabled = true;
+        } else {
+          field.disabled = false;
+        }
+      });
+    });
+
+    if (!patientForm) return;
+
+    patientForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      // Matches your dashboard.html "name" attributes
+      const patientName = patientForm.elements["patientName"]?.value ?? "";
+      const age = toIntOrNull(patientForm.elements["age"]?.value);
+      const gender = patientForm.elements["gender"]?.value ?? "";
+      const symptoms = patientForm.elements["symptoms"]?.value ?? "";
+
+      // BP is a single input (name="bp") like "120/80"
+      const bpRaw = (patientForm.elements["bp"]?.value ?? "").trim();
+      let bpSys = null;
+      let bpDia = null;
+      if (bpRaw) {
+        const m = bpRaw.match(/^\s*(\d+)\s*\/\s*(\d+)\s*$/);
+        if (m) {
+          bpSys = toIntOrNull(m[1]);
+          bpDia = toIntOrNull(m[2]);
+        }
+      }
+
+      const hr = toIntOrNull(patientForm.elements["hr"]?.value);
+      const rr = toIntOrNull(patientForm.elements["rr"]?.value);
+      const spo2 = toIntOrNull(patientForm.elements["spo2"]?.value);
+      const temp = toFloatOrNull(patientForm.elements["temp"]?.value);
+
+      // Backend DTO expects these keys:
+      const payload = {
+        name: String(patientName).trim(),
+        age: age ?? 0,
+        gender: String(gender).trim(),
+        symptoms: String(symptoms).trim(),
+        bpSys,
+        bpDia,
+        hr,
+        rr,
+        spo2,
+        temp,
+      };
+
+      try {
+        const created = await apiPost("/patients", payload);
+        const lvl = created?.triageLevel ?? "";
+        alert(lvl ? `Patient registered! Triage Level: ${lvl}` : "Patient registered!");
 
         patientForm.reset();
-        resetNoneCheckboxes();
-        registerBox.style.display = 'none';
 
-        refreshDashboard();
-    } catch (err) {
-        alert("Error creating patient.");
+        // reset "none" checkboxes
+        qsa('input[type="checkbox"][id$="-none"]').forEach((cb) => {
+          cb.checked = false;
+          const row = cb.closest(".form-row");
+          if (!row) return;
+          const field = row.querySelector(
+            'input:not([type="checkbox"]), textarea, select'
+          );
+          if (field) field.disabled = false;
+        });
+
+        if (registerBox) registerBox.style.display = "none";
+      } catch (err) {
         console.error(err);
-    }
-});
-
-
-// =====================================================================
-//  LOAD DASHBOARD PATIENTS → GET /api/patients
-// =====================================================================
-async function refreshDashboard() {
-    try {
-        const patients = await apiGet('/api/patients');
-        loadPatients(patients);
-    } catch (err) {
-        console.error("Failed to load patient list:", err);
-    }
-}
-
-// Refresh every 10 seconds
-setInterval(refreshDashboard, 10000);
-
-
-// =====================================================================
-//  RENDER PATIENTS IN THE TABLE
-// =====================================================================
-function loadPatients(patients) {
-    patientTableBody.innerHTML = "";
-
-    patients.forEach(patient => {
-        const row = document.createElement('tr');
-
-        row.innerHTML = `
-            <td>${patient.id}</td>
-            <td>${patient.name}</td>
-            <td>${patient.triageLevel}</td>
-            <td>${patient.status}</td>
-            <td>
-                <button class="view-btn" data-id="${patient.id}">View Info</button>
-                <button class="admit-btn" data-id="${patient.id}">Admit</button>
-                <button class="discharge-btn" data-id="${patient.id}">Discharge</button>
-            </td>
-        `;
-
-        patientTableBody.appendChild(row);
+        alert("Error creating patient. Check console.");
+      }
     });
+  }
 
-    attachActionButtons();
-}
+  // ==========================================================
+  // Patient Dashboard (patientDashboard.html)
+  // IDs confirmed:
+  // btnPatientInfo, btnQueue, btnInTreatment
+  // patientInfoSection, queueSection, inTreatmentSection
+  // patientTable, queueTable, inTreatmentTable
+  // patientModal, closeModalBtn, and many modal fields
+  // ==========================================================
+  async function initPatientDashboardPage() {
+    const btnPatientInfo = qs("#btnPatientInfo");
+    const btnQueue = qs("#btnQueue");
+    const btnInTreatment = qs("#btnInTreatment");
 
+    const patientInfoSection = qs("#patientInfoSection");
+    const queueSection = qs("#queueSection");
+    const inTreatmentSection = qs("#inTreatmentSection");
 
-// =====================================================================
-//  ATTACH BUTTON HANDLERS FOR VIEW / ADMIT / DISCHARGE
-// =====================================================================
-function attachActionButtons() {
+    const patientTable = qs("#patientTable");
+    const queueTable = qs("#queueTable");
+    const inTreatmentTable = qs("#inTreatmentTable");
 
-    // View Info (modal)
-    document.querySelectorAll('.view-btn').forEach(button => {
-        button.addEventListener('click', async function () {
-            const patientId = this.dataset.id;
-
-            try {
-                const patient = await apiGet(`/api/patients/${patientId}`);
-                showPatientModal(patient);
-            } catch (err) {
-                console.error("Failed to load patient info:", err);
-            }
-        });
-    });
-
-
-    // Admit Patient (IN_TREATMENT)
-    document.querySelectorAll('.admit-btn').forEach(button => {
-        button.addEventListener('click', async function () {
-            const patientId = this.dataset.id;
-
-            await apiPost(`/api/patients/${patientId}/status`, {
-                newstatus: "IN_TREATMENT"
-            });
-
-            refreshDashboard();
-        });
-    });
-
-
-    // Discharge Patient (TREATED)
-    document.querySelectorAll('.discharge-btn').forEach(button => {
-        button.addEventListener('click', async function () {
-            const patientId = this.dataset.id;
-
-            await apiPost(`/api/patients/${patientId}/status`, {
-                newstatus: "TREATED"
-            });
-
-            refreshDashboard();
-        });
-    });
-}
-
-
-// =====================================================================
-//  SHOW PATIENT DETAILS IN A MODAL (FRONT-END ONLY DISPLAY)
-// =====================================================================
-function showPatientModal(patient) {
-    const modal = document.getElementById("patientModal");
-    const modalContent = document.getElementById("modalContent");
-
-    modalContent.innerHTML = `
-        <h2>Patient Info</h2>
-        <p><strong>ID:</strong> ${patient.id}</p>
-        <p><strong>Name:</strong> ${patient.name}</p>
-        <p><strong>Age:</strong> ${patient.age}</p>
-        <p><strong>Gender:</strong> ${patient.gender}</p>
-        <p><strong>Symptoms:</strong> ${patient.symptoms}</p>
-        <p><strong>Triage Level:</strong> ${patient.triageLevel}</p>
-        <p><strong>Status:</strong> ${patient.status}</p>
-        <button onclick="closeModal()">Close</button>
-    `;
-
-    modal.style.display = "block";
-}
-
-function closeModal() {
-    document.getElementById("patientModal").style.display = "none";
-}
-
-
-// Initial load
-refreshDashboard();
-// ============================================================
-// PATIENT DASHBOARD (queueTable + inTreatmentTable)
-// ============================================================
-
-async function refreshPatientDashboard() {
-    // Only run on patientDashboard.html (tables exist there)
-    const queueTable = document.getElementById("queueTable");
-    const inTreatmentTable = document.getElementById("inTreatmentTable");
-    if (!queueTable || !inTreatmentTable) return;
-
-    await Promise.all([loadQueueTable(), loadInTreatmentTable()]);
-}
-
-async function loadQueueTable() {
-    const table = document.getElementById("queueTable");
-    const tbody = table.querySelector("tbody");
-    tbody.innerHTML = "";
-
-    // Best source for wait time is /api/queue/public (WaitingRoomView)
-    // If it doesn't exist, fallback to /api/patients
-    let data;
-    try {
-        data = await apiGet("/api/queue/public");
-    } catch (e) {
-        data = await apiGet("/api/patients?page=0&size=50");
+    // If this page isn’t patientDashboard, exit
+    if (!btnPatientInfo && !btnQueue && !btnInTreatment && !patientTable && !queueTable && !inTreatmentTable) {
+      return;
     }
 
-    data.forEach(p => {
-        const id = p.id;
-        const name = p.name ?? "-";
-        const triage = p.triageLevel ?? "-";
-        const symptoms = p.symptoms ?? "-";
-        const waitTime = p.waitTime ?? "-"; // may exist only in /queue/public
+    // ---- Tab switching ----
+    function setActiveTab(which) {
+      // buttons
+      if (btnPatientInfo) btnPatientInfo.classList.toggle("active", which === "patient");
+      if (btnQueue) btnQueue.classList.toggle("active", which === "queue");
+      if (btnInTreatment) btnInTreatment.classList.toggle("active", which === "treatment");
 
+      // sections (HTML uses class "hidden")
+      if (patientInfoSection) patientInfoSection.classList.toggle("hidden", which !== "patient");
+      if (queueSection) queueSection.classList.toggle("hidden", which !== "queue");
+      if (inTreatmentSection) inTreatmentSection.classList.toggle("hidden", which !== "treatment");
+    }
+
+    if (btnPatientInfo) btnPatientInfo.addEventListener("click", (e) => { e.preventDefault(); setActiveTab("patient"); });
+    if (btnQueue) btnQueue.addEventListener("click", (e) => { e.preventDefault(); setActiveTab("queue"); });
+    if (btnInTreatment) btnInTreatment.addEventListener("click", (e) => { e.preventDefault(); setActiveTab("treatment"); });
+
+    // Default tab
+    setActiveTab("patient");
+
+    // ---- Modal ----
+    const patientModal = qs("#patientModal");
+    const closeModalBtn = qs("#closeModalBtn");
+
+    function setText(id, value) {
+      const el = qs("#" + id);
+      if (el) el.textContent = value ?? "-";
+    }
+
+    function openModalWithPatient(p) {
+      if (!patientModal) return;
+
+      setText("modalId", p.id);
+      setText("modalName", p.name);
+      setText("modalNationalId", p.nationalId);
+      setText("modalAge", p.age);
+      setText("modalGender", p.gender);
+
+      setText("modalBp", p.bp);
+      setText("modalHr", p.hr);
+      setText("modalRr", p.rr);
+      setText("modalSpo2", p.spo2);
+      setText("modalTemp", p.temp);
+
+      setText("modalSymptoms", p.symptoms);
+      setText("modalCurrentMeds", p.currentMeds);
+      setText("modalPastHistory", p.pastHistory);
+
+      setText("modalTriageLevel", p.triageLevel);
+      setText("modalTriageScore", p.triageScore);
+      setText("modalRedFlag", p.redFlag);
+      setText("modalTriageReason", p.triageReason);
+
+      setText("modalCreatedAt", p.createdAt);
+      setText("modalUpdatedAt", p.updatedAt);
+
+      patientModal.classList.remove("hidden");
+      patientModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeModal() {
+      if (!patientModal) return;
+      patientModal.classList.add("hidden");
+      patientModal.setAttribute("aria-hidden", "true");
+    }
+
+    if (closeModalBtn) {
+      closeModalBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        closeModal();
+      });
+    }
+
+    if (patientModal) {
+      patientModal.addEventListener("click", (e) => {
+        if (e.target === patientModal) closeModal();
+      });
+    }
+
+    // ---- Table Loaders ----
+    async function loadWaitingPatients() {
+      if (!patientTable) return;
+      const tbody = patientTable.querySelector("tbody");
+      if (!tbody) return;
+
+      tbody.innerHTML = "";
+      const page = await apiGet("/patients?page=0&size=50"); // WAITING only (your backend behavior)
+
+      const list = Array.isArray(page) ? page : (page?.content ?? page?.patients ?? []);
+      list.forEach((p) => {
         const row = document.createElement("tr");
         row.innerHTML = `
-            <td>${id}</td>
-            <td>${name}</td>
-            <td>${triage}</td>
-            <td>${symptoms}</td>
-            <td>${waitTime}</td>
-            <td>
-                <button class="view-btn" data-id="${id}">View</button>
-                <button class="admit-btn" data-id="${id}">Admit</button>
-            </td>
+          <td>${escapeHtml(p.id)}</td>
+          <td>${escapeHtml(p.name ?? "-")}</td>
+          <td>${escapeHtml(p.triageLevel ?? "-")}</td>
+          <td>${escapeHtml(p.symptoms ?? "-")}</td>
+          <td class="text-right">
+            <button class="pd-view-btn" data-id="${escapeHtml(p.id)}">View</button>
+          </td>
         `;
         tbody.appendChild(row);
-    });
+      });
+    }
 
-    attachPatientDashboardButtons();
-}
+    async function loadQueue() {
+      if (!queueTable) return;
+      const tbody = queueTable.querySelector("tbody");
+      if (!tbody) return;
 
-async function loadInTreatmentTable() {
-    const table = document.getElementById("inTreatmentTable");
-    const tbody = table.querySelector("tbody");
-    tbody.innerHTML = "";
+      tbody.innerHTML = "";
+      const data = await apiGet("/queue");
 
-    const list = await apiGet("/api/patients/inTreatment?page=0&size=50");
-
-    list.forEach(p => {
-        const id = p.id;
-        const name = p.name ?? "-";
-        const triage = p.triageLevel ?? "-";
-        const symptoms = p.symptoms ?? "-";
-        const start = p.treatmentStart ?? "-"; // if not provided by backend, it will show "-"
-
+      data.forEach((p) => {
         const row = document.createElement("tr");
         row.innerHTML = `
-            <td>${id}</td>
-            <td>${name}</td>
-            <td>${triage}</td>
-            <td>${symptoms}</td>
-            <td>${start}</td>
-            <td>
-                <button class="view-btn" data-id="${id}">View</button>
-                <button class="discharge-btn" data-id="${id}">Discharge</button>
-            </td>
+          <td>${escapeHtml(p.id)}</td>
+          <td>${escapeHtml(p.name ?? "-")}</td>
+          <td>${escapeHtml(p.triageLevel ?? "-")}</td>
+          <td>${escapeHtml(p.symptoms ?? "-")}</td>
+          <td>${escapeHtml(p.waitTime ?? "-")}</td>
+          <td class="text-right">
+            <button class="pd-view-btn" data-id="${escapeHtml(p.id)}">View</button>
+            <button class="pd-admit-btn" data-id="${escapeHtml(p.id)}">Admit</button>
+          </td>
         `;
         tbody.appendChild(row);
-    });
+      });
+    }
 
-    attachPatientDashboardButtons();
-}
+    async function loadInTreatment() {
+      if (!inTreatmentTable) return;
+      const tbody = inTreatmentTable.querySelector("tbody");
+      if (!tbody) return;
 
-function attachPatientDashboardButtons() {
-    // View
-    document.querySelectorAll(".view-btn").forEach(btn => {
+      tbody.innerHTML = "";
+      const list = await apiGet("/patients/inTreatment");
+
+      list.forEach((p) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${escapeHtml(p.id)}</td>
+          <td>${escapeHtml(p.name ?? "-")}</td>
+          <td>${escapeHtml(p.triageLevel ?? "-")}</td>
+          <td>${escapeHtml(p.symptoms ?? "-")}</td>
+          <td>${escapeHtml(p.treatmentStart ?? "-")}</td>
+          <td class="text-right">
+            <button class="pd-view-btn" data-id="${escapeHtml(p.id)}">View</button>
+            <button class="pd-discharge-btn" data-id="${escapeHtml(p.id)}">Discharge</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    async function refreshAll() {
+      await Promise.all([loadWaitingPatients(), loadQueue(), loadInTreatment()]);
+      attachRowButtons();
+    }
+
+    // ---- Row Button Actions ----
+    function attachRowButtons() {
+      // View (works in all 3 tables)
+      qsa(".pd-view-btn").forEach((btn) => {
         btn.onclick = async () => {
-            const id = btn.dataset.id;
-            const patient = await apiGet(`/api/patients/${id}`);
-            showPatientModal(patient);
+          const id = btn.dataset.id;
+          try {
+            const patient = await apiGet(`/patients/${id}`);
+            openModalWithPatient(patient);
+          } catch (err) {
+            console.error(err);
+            alert("View failed. Check console.");
+          }
         };
-    });
+      });
 
-    // Admit
-    document.querySelectorAll(".admit-btn").forEach(btn => {
+      // Admit -> IN_TREATMENT
+      qsa(".pd-admit-btn").forEach((btn) => {
         btn.onclick = async () => {
-            const id = btn.dataset.id;
-            await apiPost(`/api/patients/${id}/status`, { newStatus: "IN_TREATMENT" });
-            await refreshPatientDashboard();
+          const id = btn.dataset.id;
+          try {
+            await apiPost(`/patients/${id}/status`, { newStatus: "IN_TREATMENT" });
+            await refreshAll();
+          } catch (err) {
+            console.error(err);
+            alert("Admit failed. Check console.");
+          }
         };
-    });
+      });
 
-    // Discharge
-    document.querySelectorAll(".discharge-btn").forEach(btn => {
+      // Discharge -> TREATED
+      qsa(".pd-discharge-btn").forEach((btn) => {
         btn.onclick = async () => {
-            const id = btn.dataset.id;
-            await apiPost(`/api/patients/${id}/status`, { newStatus: "TREATED" });
-            await refreshPatientDashboard();
+          const id = btn.dataset.id;
+          try {
+            await apiPost(`/patients/${id}/status`, { newStatus: "TREATED" });
+            await refreshAll();
+          } catch (err) {
+            console.error(err);
+            alert("Discharge failed. Check console.");
+          }
         };
-    });
-}
+      });
+    }
 
-// Run both dashboards safely (each function checks if its page exists)
-refreshDashboard();
-refreshPatientDashboard();
+    await refreshAll();
+  }
+
+  // ==========================================================
+  // Boot
+  // ==========================================================
+  document.addEventListener("DOMContentLoaded", () => {
+    initLoginPage();
+    initDashboardPage();
+    initPatientDashboardPage().catch((e) => console.error(e));
+  });
+})();
