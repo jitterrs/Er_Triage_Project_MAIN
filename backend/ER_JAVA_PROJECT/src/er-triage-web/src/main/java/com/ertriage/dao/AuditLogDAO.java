@@ -16,12 +16,29 @@ import java.util.List;
 
 public class AuditLogDAO {
 
-    private Connection getConnection() throws SQLException {
-        String url  = "jdbc:mysql://localhost:3306/er_triage_db";
-        String user = "root";      // same as MainDemo
-        String pass = "Yaznbash2002@";  // same as MainDemo
-        return DriverManager.getConnection(url, user, pass);
+   private Connection getConnection() throws SQLException {
+
+    try {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+    } catch (ClassNotFoundException e) {
+        throw new RuntimeException("MySQL JDBC Driver not found.", e);
     }
+
+    String url =
+            "jdbc:mysql://localhost:3306/er_triage_db"
+            + "?useSSL=false"
+            + "&allowPublicKeyRetrieval=true"
+            + "&serverTimezone=UTC"
+            + "&connectTimeout=5000"
+            + "&socketTimeout=5000";
+
+    String user = "root";
+    String pass = "Yaznbash2002@";
+
+    DriverManager.setLoginTimeout(5);
+    return DriverManager.getConnection(url, user, pass);
+}
+
 
     // 7.9.1 save()
     public void save(AuditLog log) {

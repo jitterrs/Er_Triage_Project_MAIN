@@ -11,6 +11,7 @@ com\ertriage\dto\ChangeStatusRequest.class
 com\ertriage\model\Vitals.class
 com\ertriage\model\TriageResult.class
 com\ertriage\service\ValidationService.class
+com\ertriage\web\QueueApiServlet.class
 com\ertriage\service\KeywordService$SymptomAnalysis.class
 com\ertriage\web\MetricsController.class
 com\ertriage\web\ApiError.class

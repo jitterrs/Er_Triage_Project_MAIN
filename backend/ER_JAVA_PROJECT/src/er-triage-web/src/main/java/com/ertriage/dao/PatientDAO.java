@@ -10,21 +10,30 @@ import java.util.List;
 
 public class PatientDAO {
 
-    private Connection getConnection() throws SQLException {
-
-        System.out.println(">>> PatientDAO.getConnection() NEW VERSION LOADED");
+private Connection getConnection() throws SQLException {
 
     try {
         Class.forName("com.mysql.cj.jdbc.Driver");
     } catch (ClassNotFoundException e) {
-        throw new RuntimeException("MySQL JDBC Driver not found (mysql-connector-j missing).", e);
+        throw new RuntimeException("MySQL JDBC Driver not found.", e);
     }
 
-    String url = "jdbc:mysql://localhost:3306/er_triage_db";
+    // ✅ Add timeouts + disable SSL (prevents “infinite loading” hangs)
+    String url =
+            "jdbc:mysql://localhost:3306/er_triage_db"
+            + "?useSSL=false"
+            + "&allowPublicKeyRetrieval=true"
+            + "&serverTimezone=UTC"
+            + "&connectTimeout=5000"
+            + "&socketTimeout=5000";
+
     String user = "root";
     String pass = "Yaznbash2002@";
+
+    DriverManager.setLoginTimeout(5); // seconds
     return DriverManager.getConnection(url, user, pass);
 }
+
 
 
     // 7.8.1 save()

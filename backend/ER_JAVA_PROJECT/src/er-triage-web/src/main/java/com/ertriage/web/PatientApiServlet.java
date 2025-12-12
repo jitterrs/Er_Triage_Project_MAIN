@@ -114,6 +114,8 @@ public class PatientApiServlet extends HttpServlet {
    @Override
 protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     resp.setHeader("X-ERTRIAGE-BUILD", "IN_TREATMENT_ROUTE_OK");
+    System.out.println("doGet /api/patients hit, path=" + req.getPathInfo());
+
     String path = req.getPathInfo();  // null, "/", "/{id}", or "/inTreatment"
 
     try {
@@ -134,10 +136,13 @@ protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IO
             int size = parseIntOrDefault(req.getParameter("size"), 20);
             String nameFilter = req.getParameter("name");
 
+            System.out.println("About to call listWaiting...");
             List<PatientView> list = patientController.listWaiting(page, size, nameFilter);
+            System.out.println("Returned from listWaiting.");
             writeJson(resp, HttpServletResponse.SC_OK, list);
             return;
         }
+
 
         // Existing behavior: GET by id
         String[] parts = path.split("/");
