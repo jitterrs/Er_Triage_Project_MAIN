@@ -156,7 +156,7 @@ function attachActionButtons() {
             const patientId = this.dataset.id;
 
             await apiPost(`/api/patients/${patientId}/status`, {
-                status: "IN_TREATMENT"
+                newstatus: "IN_TREATMENT"
             });
 
             refreshDashboard();
@@ -170,7 +170,7 @@ function attachActionButtons() {
             const patientId = this.dataset.id;
 
             await apiPost(`/api/patients/${patientId}/status`, {
-                status: "TREATED"
+                newstatus: "TREATED"
             });
 
             refreshDashboard();
@@ -208,3 +208,119 @@ function closeModal() {
 
 // Initial load
 refreshDashboard();
+// ============================================================
+// PATIENT DASHBOARD (queueTable + inTreatmentTable)
+// ============================================================
+
+async function refreshPatientDashboard() {
+    // Only run on patientDashboard.html (tables exist there)
+    const queueTable = document.getElementById("queueTable");
+    const inTreatmentTable = document.getElementById("inTreatmentTable");
+    if (!queueTable || !inTreatmentTable) return;
+
+    await Promise.all([loadQueueTable(), loadInTreatmentTable()]);
+}
+
+async function loadQueueTable() {
+    const table = document.getElementById("queueTable");
+    const tbody = table.querySelector("tbody");
+    tbody.innerHTML = "";
+
+    // Best source for wait time is /api/queue/public (WaitingRoomView)
+    // If it doesn't exist, fallback to /api/patients
+    let data;
+    try {
+        data = await apiGet("/api/queue/public");
+    } catch (e) {
+        data = await apiGet("/api/patients?page=0&size=50");
+    }
+
+    data.forEach(p => {
+        const id = p.id;
+        const name = p.name ?? "-";
+        const triage = p.triageLevel ?? "-";
+        const symptoms = p.symptoms ?? "-";
+        const waitTime = p.waitTime ?? "-"; // may exist only in /queue/public
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${id}</td>
+            <td>${name}</td>
+            <td>${triage}</td>
+            <td>${symptoms}</td>
+            <td>${waitTime}</td>
+            <td>
+                <button class="view-btn" data-id="${id}">View</button>
+                <button class="admit-btn" data-id="${id}">Admit</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    attachPatientDashboardButtons();
+}
+
+async function loadInTreatmentTable() {
+    const table = document.getElementById("inTreatmentTable");
+    const tbody = table.querySelector("tbody");
+    tbody.innerHTML = "";
+
+    const list = await apiGet("/api/patients/inTreatment?page=0&size=50");
+
+    list.forEach(p => {
+        const id = p.id;
+        const name = p.name ?? "-";
+        const triage = p.triageLevel ?? "-";
+        const symptoms = p.symptoms ?? "-";
+        const start = p.treatmentStart ?? "-"; // if not provided by backend, it will show "-"
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${id}</td>
+            <td>${name}</td>
+            <td>${triage}</td>
+            <td>${symptoms}</td>
+            <td>${start}</td>
+            <td>
+                <button class="view-btn" data-id="${id}">View</button>
+                <button class="discharge-btn" data-id="${id}">Discharge</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    attachPatientDashboardButtons();
+}
+
+function attachPatientDashboardButtons() {
+    // View
+    document.querySelectorAll(".view-btn").forEach(btn => {
+        btn.onclick = async () => {
+            const id = btn.dataset.id;
+            const patient = await apiGet(`/api/patients/${id}`);
+            showPatientModal(patient);
+        };
+    });
+
+    // Admit
+    document.querySelectorAll(".admit-btn").forEach(btn => {
+        btn.onclick = async () => {
+            const id = btn.dataset.id;
+            await apiPost(`/api/patients/${id}/status`, { newStatus: "IN_TREATMENT" });
+            await refreshPatientDashboard();
+        };
+    });
+
+    // Discharge
+    document.querySelectorAll(".discharge-btn").forEach(btn => {
+        btn.onclick = async () => {
+            const id = btn.dataset.id;
+            await apiPost(`/api/patients/${id}/status`, { newStatus: "TREATED" });
+            await refreshPatientDashboard();
+        };
+    });
+}
+
+// Run both dashboards safely (each function checks if its page exists)
+refreshDashboard();
+refreshPatientDashboard();
