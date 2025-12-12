@@ -1,4 +1,5 @@
 {
+    "java.configuration.updateBuildConfiguration": "automatic",
     "sqltools.connections": [
         {
             "mysqlOptions": {
@@ -10,17 +11,10 @@
             "server": "localhost",
             "port": 3306,
             "driver": "MySQL",
+            "name": "er_triage",
             "database": "mysql",
             "username": "root",
-            "password": "Yaznbash2002@",
-            "name": "er_system"
+            "password": "Yaznbash2002@"
         }
-
-    ],
-    "java.project.referencedLibraries": [
-        "lib/**/*.jar",
-        "c:\\Users\\rakan\\Desktop\\mysql-connector-j-9.5.0\\mysql-connector-j-9.5.0.jar"
-
-    ],
-    "java.configuration.updateBuildConfiguration": "interactive"
+    ]
 }

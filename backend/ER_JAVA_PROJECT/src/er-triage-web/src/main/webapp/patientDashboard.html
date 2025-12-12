@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Patient Dashboard | Hospital Triage System</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="main.js" defer></script>
+</head>
+<body>
+  <!-- ACCESSIBILITY TOGGLE -->
+  <button class="accessibility-toggle" id="accessibilityToggle" aria-label="Accessibility Options">
+    ♿
+  </button>
+
+  <!-- ACCESSIBILITY PANEL -->
+  <div class="accessibility-panel accessibility-hidden" id="accessibilityPanel">
+    <h3 style="margin-top: 0; margin-bottom: 15px;">Accessibility Options</h3>
+    
+    <div class="accessibility-option">
+      <input type="checkbox" id="reduceBrightness">
+      <label for="reduceBrightness">Reduce Brightness</label>
+    </div>
+
+    <div class="accessibility-option">
+      <input type="checkbox" id="highContrast">
+      <label for="highContrast">High Contrast Mode</label>
+    </div>
+
+    <div class="accessibility-option">
+      <input type="checkbox" id="largeText">
+      <label for="largeText">Large Text</label>
+    </div>
+
+    <div class="accessibility-option">
+      <input type="checkbox" id="reduceMotion">
+      <label for="reduceMotion">Reduce Motion</label>
+    </div>
+
+    <div class="accessibility-option">
+      <label for="brightnessSlider">Brightness:</label>
+      <input type="range" id="brightnessSlider" min="50" max="100" value="100">
+      <span id="brightnessValue">100%</span>
+    </div>
+
+    <div class="accessibility-option">
+      <button onclick="resetAccessibility()" style="background: #e74c3c; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+        Reset All
+      </button>
+    </div>
+  </div>
+
+  <!-- UNIVERSAL HEADER -->
+  <header class="main-header">
+    <div class="header-content">
+      <img src="/webapp/images/xCGUQrew_400x400.jpg" alt="Hospital Logo" class="logo">
+      <h1>Hospital Triage System</h1>
+    </div>
+  </header>
+
+  <!-- MAIN DASHBOARD -->
+  <div class="patient-dashboard-container">
+    <!-- Left Sidebar Buttons -->
+    <div class="dashboard-buttons">
+      <button id="btnPatientInfo" class="active">Patient Info</button>
+      <button id="btnQueue">Queue</button>
+      <button id="btnInTreatment">In-Treatment</button>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="dashboard-content">
+      <!-- Patient Info Table -->
+      <div id="patientInfoSection" class="content-section">
+        <div class="table-container">
+          <table id="patientTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Triage Level</th>
+                <th>Symptoms</th>
+                <th class="text-right">Full Info</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- rows injected by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Queue Table (Level 2 & 3 only) -->
+      <div id="queueSection" class="content-section hidden">
+        <div class="table-container">
+          <table id="queueTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Triage Level</th>
+                <th>Symptoms</th>
+                <th>Wait Time</th>
+                <th class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- rows injected by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- In-Treatment Table (Level 1 only) -->
+      <div id="inTreatmentSection" class="content-section hidden">
+        <div class="table-container">
+          <table id="inTreatmentTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Triage Level</th>
+                <th>Symptoms</th>
+                <th>Treatment Start</th>
+                <th class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- rows injected by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Patient Detail Modal -->
+  <div id="patientModal" class="modal hidden" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-content" role="document">
+      <div class="modal-header">
+        <h3 id="modalTitle">Patient Full Information</h3>
+        <button class="close-modal" id="closeModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="patient-basic-info">
+          <h4 id="modalPatientName">Patient Name</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Patient ID:</span>
+              <span id="modalPatientId" class="info-value">-</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">National ID:</span>
+              <span id="modalNationalId" class="info-value">-</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Age:</span>
+              <span id="modalPatientAge" class="info-value">-</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Gender:</span>
+              <span id="modalPatientGender" class="info-value">-</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Phone:</span>
+              <span id="modalPatientPhone" class="info-value">-</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Status:</span>
+              <span id="modalStatus" class="info-value">-</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-tabs">
+          <button class="tab-btn active" data-tab="vitals">Vitals</button>
+          <button class="tab-btn" data-tab="symptoms">Symptoms</button>
+          <button class="tab-btn" data-tab="history">Medical History</button>
+          <button class="tab-btn" data-tab="triage">Triage Details</button>
+        </div>
+
+        <div class="tab-content">
+          <div id="vitals" class="tab-pane active">
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">BP (Systolic):</span>
+                <span id="modalBpSys" class="info-value">-</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">BP (Diastolic):</span>
+                <span id="modalBpDia" class="info-value">-</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Heart Rate (HR):</span>
+                <span id="modalHr" class="info-value">-</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Resp Rate (RR):</span>
+                <span id="modalRr" class="info-value">-</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">SpO2 (%):</span>
+                <span id="modalSpo2" class="info-value">-</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Temp (°C):</span>
+                <span id="modalTemp" class="info-value">-</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="symptoms" class="tab-pane">
+            <p id="modalSymptoms">-</p>
+          </div>
+
+          <div id="history" class="tab-pane">
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Current Medications:</span>
+                <span id="modalCurrentMeds" class="info-value">-</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Past Medical History:</span>
+                <span id="modalPastHistory" class="info-value">-</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="triage" class="tab-pane">
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Triage Level:</span>
+                <span id="modalTriageLevel" class="info-value">-</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Triage Score:</span>
+                <span id="modalTriageScore" class="info-value">-</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Red Flag:</span>
+                <span id="modalRedFlag" class="info-value">-</span>
+              </div>
+              <div class="info-item" style="grid-column:1 / -1;">
+                <span class="info-label">Triage Reason:</span>
+                <span id="modalTriageReason" class="info-value">-</span>
+              </div>
+            </div>
+            <div style="margin-top:16px; font-size:13px; color:#666;">
+              <div>Created at: <span id="modalCreatedAt">-</span></div>
+              <div>Updated at: <span id="modalUpdatedAt">-</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UNIVERSAL FOOTER -->
+  <footer class="main-footer">
+    <div class="footer-content">
+      <img src="/webapp/images/xCGUQrew_400x400.jpg" alt="Hospital Logo" class="footer-logo">
+      <p>© 2025 Hospital Triage System. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>
