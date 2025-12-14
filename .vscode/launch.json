@@ -2,7 +2,13 @@
     
     "version": "0.2.0",
     "configurations": [
-        
+        {
+            "type": "java",
+            "name": "MainDemo",
+            "request": "launch",
+            "mainClass": "com.ertriage.MainDemo",
+            "projectName": ""
+        },
         {
             "type": "java",
             "name": "Current File",

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ER Waiting Queue</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="tv.css" />
+</head>
+
+<body class="dim-overlay">
+
+<header class="main-header">
+  <div class="header-content">
+    <img src="/webapp/images/xCGUQrew_400x400.jpg" class="logo" alt="Hospital Logo">
+    <h1>Hospital Triage System</h1>
+  </div>
+</header>
+
+<main class="tv-wrapper">
+
+  <!-- BIG CENTER HEADER -->
+  <section class="tv-hero">
+    <h2>ER Waiting Queue</h2>
+    <p id="queueMeta">Waiting patients: 0</p>
+
+    <div class="tv-hero-status">
+      <span id="lastUpdated">Last update: --</span>
+      <span id="connectionPill" class="connected">Connected</span>
+    </div>
+  </section>
+
+  <!-- WAITING QUEUE ONLY -->
+  <section class="tv-card">
+    <div class="tv-card-header">
+      <h3>Waiting Queue</h3>
+      <span id="waitingCount" class="count-pill">0</span>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Ticket</th>
+          <th>Name</th>
+          <th>Triage Level</th>
+          <th>Expected Wait</th>
+        </tr>
+      </thead>
+      <tbody id="boardBody">
+        <tr><td colspan="4" class="muted">Loading...</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="tv-footer">
+    <span>Auto-refresh enabled • Read-only • Privacy-safe</span>
+
+    <div class="dim-control">
+      <span>Dim</span>
+      <input id="dimRange" type="range" min="0" max="80" value="20">
+      <span id="dimValue">20%</span>
+    </div>
+  </footer>
+
+</main>
+
+<script src="tv.js"></script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>ER Triage System Dashboard</title>
+</head>
+
+<body>
+  <!-- HEADER -->
+  <header class="main-header">
+    <div class="header-content">
+      <img src="/webapp/images/xCGUQrew_400x400.jpg" alt="Hospital Logo" class="logo">
+      <h1>Hospital Triage System</h1>
+    </div>
+  </header>
+
+  <!-- DASHBOARD CONTAINER CENTERED -->
+  <div class="dashboard-center">
+    <div class="dashboard-box">
+      <h2>ER Triage System</h2>
+      <button id="viewBtn" class="btn btn-primary">View Patients</button>
+      <button id="registerBtn" class="btn btn-primary">Register Patient</button>
+    </div>
+  </div>
+
+  <!-- REGISTER POPUP BOX -->
+  <div class="register-box" id="registerBox">
+    <h2>Register Patient</h2>
+    <form id="patientForm">
+
+      <!-- Basic Information Section -->
+      <div class="form-section">
+        <h3>Basic Information</h3>
+
+        <!-- Patient Name (Split) -->
+        <div class="form-row">
+          <input type="text" name="firstName" id="firstName" placeholder="First Name">
+          <input type="text" name="lastName" id="lastName" placeholder="Last Name">
+          <div class="none-option">
+            <input type="checkbox" id="nameUnknown">
+            <label for="nameUnknown">None</label>
+          </div>
+        </div>
+
+        <!-- National ID + Phone (needed for Full Info modal + search) -->
+        <div class="form-row">
+          <input type="text" name="nationalId" placeholder="National ID">
+          <div class="none-option">
+            <input type="checkbox" id="nationalId-none">
+            <label for="nationalId-none">None</label>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <input type="text" name="phone" placeholder="Phone">
+          <div class="none-option">
+            <input type="checkbox" id="phone-none">
+            <label for="phone-none">None</label>
+          </div>
+        </div>
+
+        <!-- Age -->
+        <div class="form-row">
+          <input type="number" name="age" placeholder="Age" min="1" required>
+        </div>
+
+        <!-- Gender -->
+        <div class="form-row">
+          <select name="gender" required>
+            <option value="" disabled selected>Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+          <div class="none-option">
+            <input type="checkbox" id="gender-none">
+            <label for="gender-none">None</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vital Signs Section -->
+      <div class="form-section">
+        <h3>Vital Signs</h3>
+
+        <!-- Blood Pressure (split to match backend + main.js payload bpSys/bpDia) -->
+        <div class="form-row">
+          <input type="number" name="bpSys" placeholder="BP Systolic (e.g. 120)">
+          <input type="number" name="bpDia" placeholder="BP Diastolic (e.g. 80)">
+          <div class="none-option">
+            <input type="checkbox" id="bp-none">
+            <label for="bp-none">None</label>
+          </div>
+        </div>
+
+        <!-- Heart Rate -->
+        <div class="form-row">
+          <input type="number" name="hr" placeholder="Heart Rate (HR)">
+          <div class="none-option">
+            <input type="checkbox" id="hr-none">
+            <label for="hr-none">None</label>
+          </div>
+        </div>
+
+        <!-- Respiratory Rate -->
+        <div class="form-row">
+          <input type="number" name="rr" placeholder="Respiratory Rate (RR)">
+          <div class="none-option">
+            <input type="checkbox" id="rr-none">
+            <label for="rr-none">None</label>
+          </div>
+        </div>
+
+        <!-- Oxygen Saturation -->
+        <div class="form-row">
+          <input type="number" name="spo2" placeholder="Oxygen Saturation (SpO2)">
+          <div class="none-option">
+            <input type="checkbox" id="spo2-none">
+            <label for="spo2-none">None</label>
+          </div>
+        </div>
+
+        <!-- Temperature -->
+        <div class="form-row">
+          <input type="number" step="0.1" name="temp" placeholder="Temperature (°C)">
+          <div class="none-option">
+            <input type="checkbox" id="temp-none">
+            <label for="temp-none">None</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Symptoms Section -->
+      <div class="form-section">
+        <h3>Symptoms</h3>
+        <div class="form-row">
+          <textarea name="symptoms" placeholder="Describe symptoms"></textarea>
+          <div class="none-option">
+            <input type="checkbox" id="symptoms-none">
+            <label for="symptoms-none">None</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-buttons">
+        <button type="submit" id="newRegisterBtn" class="btn btn-primary">Register Patient</button>
+        <button type="button" id="cancelRegister" class="btn btn-danger">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="main-footer">
+    <div class="footer-content">
+      <img src="/webapp/images/xCGUQrew_400x400.jpg" alt="Hospital Logo" class="footer-logo">
+      <p>© 2025 Hospital Triage System</p>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
