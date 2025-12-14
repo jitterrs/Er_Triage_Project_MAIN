@@ -479,30 +479,36 @@
     }
 
     function renderWaitingPatients() {
-      if (!patientTable) return;
-      const tbody = patientTable.querySelector("tbody");
-      if (!tbody) return;
+  if (!patientTable) return;
+  const tbody = patientTable.querySelector("tbody");
+  if (!tbody) return;
 
-      const q = getQuery("patientSearch");
-      const filtered = cachedWaitingPatients.filter(p => matchesPatient(p, q));
+  // Combine WAITING + IN_TREATMENT for Patient Info
+  const map = new Map();
+  [...cachedWaitingPatients, ...cachedInTreatmentPatients].forEach(p => map.set(p.id, p));
+  const allPatients = Array.from(map.values());
 
-      tbody.innerHTML = "";
-      filtered.forEach((p) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${escapeHtml(p.id)}</td>
-          <td>${escapeHtml(p.name ?? "-")}</td>
-          <td>${escapeHtml(p.triageLevel ?? "-")}</td>
-          <td>${escapeHtml(p.symptoms ?? "-")}</td>
-          <td class="text-right">
-            <button class="pd-view-btn info-btn action-btn" data-id="${escapeHtml(p.id)}">View</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
+  const q = getQuery("patientSearch");
+  const filtered = allPatients.filter(p => matchesPatient(p, q));
 
-      setCount("patientSearchCount", filtered.length, cachedWaitingPatients.length);
-    }
+  tbody.innerHTML = "";
+  filtered.forEach((p) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${escapeHtml(p.id)}</td>
+      <td>${escapeHtml(p.name ?? "-")}</td>
+      <td>${escapeHtml(p.triageLevel ?? "-")}</td>
+      <td>${escapeHtml(p.symptoms ?? "-")}</td>
+      <td class="text-right">
+        <button class="pd-view-btn info-btn action-btn" data-id="${escapeHtml(p.id)}">View</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  setCount("patientSearchCount", filtered.length, allPatients.length);
+}
+
 
     function renderQueue() {
       if (!queueTable) return;
@@ -582,10 +588,14 @@
     }
 
     async function loadInTreatment() {
-      const list = await apiGet("/patients/inTreatment");
-      cachedInTreatmentPatients = Array.isArray(list) ? list : [];
-      renderInTreatment();
-    }
+  const list = await apiGet("/patients/inTreatment");
+  cachedInTreatmentPatients = Array.isArray(list) ? list : [];
+  renderInTreatment();
+
+  // IMPORTANT: Patient Info also depends on in-treatment patients
+  renderWaitingPatients();
+}
+
 
     async function refreshAll() {
       await Promise.all([loadWaitingPatients(), loadQueue(), loadInTreatment()]);
@@ -654,3 +664,48 @@
     });
   });
 })();
+
+function initLoginPage() {
+  const loginForm = qs("#loginForm");
+  if (!loginForm) return;
+
+  const usernameEl = qs("#username");
+  const passwordEl = qs("#password");
+  const msg = qs("#loginMessage");
+
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const username = (usernameEl?.value ?? "").trim();
+    const password = (passwordEl?.value ?? "").trim();
+
+    if (msg) msg.textContent = "";
+
+    // Basic frontend rules
+    if (!username || !password) {
+      if (msg) msg.textContent = "Username and password are required.";
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => null);
+        if (msg) msg.textContent = err?.error ?? "Login failed.";
+        return;
+      }
+
+      const data = await res.json().catch(() => null);
+      // On success, go to dashboard
+      window.location.href = `${APP_CTX}/dashboard.html`;
+    } catch (err) {
+      if (msg) msg.textContent = "Network error. Please try again.";
+      console.error(err);
+    }
+  });
+}
