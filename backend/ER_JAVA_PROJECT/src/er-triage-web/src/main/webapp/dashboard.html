@@ -34,22 +34,36 @@
       <div class="form-section">
         <h3>Basic Information</h3>
 
-        <!-- Patient Name -->
+        <!-- Patient Name (Split) -->
         <div class="form-row">
-          <input type="text" name="patientName" placeholder="Patient Name" required>
+          <input type="text" name="firstName" id="firstName" placeholder="First Name">
+          <input type="text" name="lastName" id="lastName" placeholder="Last Name">
           <div class="none-option">
-            <input type="checkbox" id="patientName-none">
-            <label for="patientName-none">None</label>
+            <input type="checkbox" id="nameUnknown">
+            <label for="nameUnknown">None</label>
+          </div>
+        </div>
+
+        <!-- National ID + Phone (needed for Full Info modal + search) -->
+        <div class="form-row">
+          <input type="text" name="nationalId" placeholder="National ID">
+          <div class="none-option">
+            <input type="checkbox" id="nationalId-none">
+            <label for="nationalId-none">None</label>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <input type="text" name="phone" placeholder="Phone">
+          <div class="none-option">
+            <input type="checkbox" id="phone-none">
+            <label for="phone-none">None</label>
           </div>
         </div>
 
         <!-- Age -->
         <div class="form-row">
-          <input type="number" name="age" placeholder="Age" required>
-          <div class="none-option">
-            <input type="checkbox" id="age-none">
-            <label for="age-none">None</label>
-          </div>
+          <input type="number" name="age" placeholder="Age" min="1" required>
         </div>
 
         <!-- Gender -->
@@ -70,9 +84,10 @@
       <div class="form-section">
         <h3>Vital Signs</h3>
 
-        <!-- Blood Pressure -->
+        <!-- Blood Pressure (split to match backend + main.js payload bpSys/bpDia) -->
         <div class="form-row">
-          <input type="text" name="bp" placeholder="BP (e.g. 120/80)">
+          <input type="number" name="bpSys" placeholder="BP Systolic (e.g. 120)">
+          <input type="number" name="bpDia" placeholder="BP Diastolic (e.g. 80)">
           <div class="none-option">
             <input type="checkbox" id="bp-none">
             <label for="bp-none">None</label>

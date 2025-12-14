@@ -71,7 +71,12 @@
     <div class="dashboard-content">
       <!-- Patient Info Table -->
       <div id="patientInfoSection" class="content-section">
-        <div class="table-container">
+        
+        <div class="search-bar">
+          <input type="text" id="patientSearch" class="search-input" placeholder="Search by Name / ID / National ID ..." autocomplete="off" />
+          <div class="search-meta"><span id="patientSearchCount">0 / 0</span></div>
+        </div>
+<div class="table-container">
           <table id="patientTable">
             <thead>
               <tr>
@@ -91,7 +96,12 @@
 
       <!-- Queue Table (Level 2 & 3 only) -->
       <div id="queueSection" class="content-section hidden">
-        <div class="table-container">
+        
+        <div class="search-bar">
+          <input type="text" id="queueSearch" class="search-input" placeholder="Search Queue by Name / ID / National ID ..." autocomplete="off" />
+          <div class="search-meta"><span id="queueSearchCount">0 / 0</span></div>
+        </div>
+<div class="table-container">
           <table id="queueTable">
             <thead>
               <tr>
@@ -112,7 +122,12 @@
 
       <!-- In-Treatment Table (Level 1 only) -->
       <div id="inTreatmentSection" class="content-section hidden">
-        <div class="table-container">
+        
+        <div class="search-bar">
+          <input type="text" id="treatmentSearch" class="search-input" placeholder="Search In-Treatment by Name / ID / National ID ..." autocomplete="off" />
+          <div class="search-meta"><span id="treatmentSearchCount">0 / 0</span></div>
+        </div>
+<div class="table-container">
           <table id="inTreatmentTable">
             <thead>
               <tr>
@@ -174,7 +189,6 @@
         <div class="modal-tabs">
           <button class="tab-btn active" data-tab="vitals">Vitals</button>
           <button class="tab-btn" data-tab="symptoms">Symptoms</button>
-          <button class="tab-btn" data-tab="history">Medical History</button>
           <button class="tab-btn" data-tab="triage">Triage Details</button>
         </div>
 
@@ -211,21 +225,7 @@
           <div id="symptoms" class="tab-pane">
             <p id="modalSymptoms">-</p>
           </div>
-
-          <div id="history" class="tab-pane">
-            <div class="info-grid">
-              <div class="info-item">
-                <span class="info-label">Current Medications:</span>
-                <span id="modalCurrentMeds" class="info-value">-</span>
-              </div>
-              <div class="info-item">
-                <span class="info-label">Past Medical History:</span>
-                <span id="modalPastHistory" class="info-value">-</span>
-              </div>
-            </div>
-          </div>
-
-          <div id="triage" class="tab-pane">
+<div id="triage" class="tab-pane">
             <div class="info-grid">
               <div class="info-item">
                 <span class="info-label">Triage Level:</span>
